@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>速滑服专用智能选码系统 · 连体款</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbLoadFailed=true"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onerror="console.warn('xlsx库加载失败')"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f2;--card:#fff;--text:#1a1a1a;--text2:#555;--text3:#999;--border:#e8e8e3;--accent:#0F6E56;--accent-bg:#E1F5EE;--accent2:#378ADD;--accent2-bg:#E6F1FB;--danger:#E24B4A;--danger-bg:#FCEBEB;--warn:#D4850B;--warn-bg:#FFF8E1;--purple:#7B61FF;--purple-bg:#F0EAFF;--gold:#D4850B;--gold-bg:#FFF8E1;--radius:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.page{max-width:420px;margin:0 auto;padding:16px}
+
+/* Header */
+.header{text-align:center;padding:20px 0 12px}
+.header h1{font-size:20px;font-weight:700;letter-spacing:3px;color:var(--accent)}
+.header p{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:1px}
+
+/* Team code banner */
+.team-banner{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;position:relative}
+.team-banner .tb-top{display:flex;align-items:center;gap:10px}
+.team-banner .tb-icon{font-size:28px}
+.team-banner .tb-info{flex:1}
+.team-banner .tb-label{font-size:10px;opacity:.8}
+.team-banner .tb-code{font-size:20px;font-weight:700;letter-spacing:3px}
+.team-banner .tb-exit{width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.team-banner .tb-exit:hover{background:rgba(255,255,255,.25)}
+.team-banner .tb-exit:active{background:rgba(255,255,255,.35)}
+.team-banner .tb-stats{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2)}
+.team-banner .tb-stat{text-align:center;flex:1}
+.team-banner .tb-stat-val{font-size:16px;font-weight:700}
+.team-banner .tb-stat-lbl{font-size:9px;opacity:.7}
+.team-banner .tb-discount{margin-top:8px;background:rgba(255,255,255,.18);border-radius:8px;padding:6px 12px;text-align:center;font-size:11px;font-weight:600}
+.tb-coach-name{font-size:11px;opacity:.9;margin-top:2px}
+
+/* Team code input */
+.team-input-card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:14px;border:1px solid var(--border);text-align:center}
+.team-input-card h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px}
+.team-input-card p{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.7}
+.team-input-row{display:flex;gap:8px}
+.team-input-row input{flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;text-align:center;letter-spacing:2px;text-transform:uppercase}
+.team-input-row input:focus{border-color:var(--accent);background:#fff}
+.team-input-row button{padding:12px 20px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;white-space:nowrap}
+.team-input-row button:active{transform:scale(.98)}
+.team-create{font-size:12px;color:var(--accent);cursor:pointer;margin-top:10px;font-weight:500}
+.team-create:hover{text-decoration:underline}
+
+/* Create team modal */
+.create-team-form{text-align:left;padding:0 4px}
+.create-team-form .ctf-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;text-align:center}
+.create-team-form .ctf-desc{font-size:11px;color:var(--text3);text-align:center;margin-bottom:16px;line-height:1.6}
+.create-team-form .fg{margin-bottom:12px}
+.create-team-form .fg label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.create-team-form .fg label .req{color:var(--danger);font-weight:700;margin-left:2px}
+.create-team-form .fg input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;transition:border .15s;background:#fafaf9}
+.create-team-form .fg input:focus{border-color:var(--accent);background:#fff}
+.create-team-form .ctf-submit{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;letter-spacing:1px;margin-top:8px}
+.create-team-form .ctf-submit:active{transform:scale(.98)}
+.create-team-form .ctf-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:8px}
+
+/* Product selector */
+.prod-seg{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.prod-chip{padding:7px 14px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:var(--card);transition:all .15s;display:flex;align-items:center;gap:4px}
+.prod-chip.on{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+
+/* Segments */
+.seg{display:flex;background:#ececea;border-radius:10px;padding:3px;margin-bottom:16px}
+.seg-item{flex:1;text-align:center;padding:9px 0;font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;color:var(--text2);user-select:none}
+.seg-item.on{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+
+.card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:14px;border:1px solid var(--border)}
+.mode-switch{display:flex;gap:8px;margin-bottom:18px}
+.mode-btn{flex:1;padding:12px 6px;border-radius:12px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:all .15s;background:var(--card);position:relative}
+.mode-btn.on{border-color:var(--accent);background:var(--accent-bg)}
+.mode-btn .m-icon{font-size:20px;display:block;margin-bottom:2px}
+.mode-btn .m-title{font-size:12px;font-weight:600;color:var(--text)}
+.mode-btn .m-sub{font-size:9px;color:var(--text3);margin-top:2px}
+.mode-btn.on .m-title{color:var(--accent)}
+.mode-btn.on .m-sub{color:var(--accent)}
+.mode-btn .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
+.mode-btn .badge.show{display:flex}
+
+.fg{margin-bottom:14px}
+.fg label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.fg label .req{color:var(--danger);font-weight:700;margin-left:2px}
+.fg label .hint{font-size:10px;color:var(--text3);font-weight:400}
+.fg input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;outline:none;transition:border .15s;background:#fafaf9;-webkit-appearance:none}
+.fg input:focus{border-color:var(--accent);background:#fff}
+.fg input::placeholder{color:#ccc;font-size:14px}
+.row{display:flex;gap:10px}
+.row .fg{flex:1}
+
+/* Fit */
+.fit-row{display:flex;gap:10px;margin-bottom:16px}
+.fit-card{flex:1;padding:12px 6px;border-radius:10px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:all .15s;background:var(--card)}
+.fit-card.on{border-color:var(--accent);background:var(--accent-bg)}
+.fit-card .f-icon{font-size:22px;display:block;margin-bottom:4px}
+.fit-card .f-name{font-size:12px;font-weight:600;color:var(--text)}
+.fit-card .f-desc{font-size:9px;color:var(--text3);margin-top:2px}
+.fit-card.on .f-name{color:var(--accent)}
+
+/* Fat option - stacked distinct cards */
+.fat-option-row{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.fat-option-card{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:all .15s;background:var(--card);gap:10px}
+.fat-option-card.on{border-color:var(--accent);background:var(--accent-bg)}
+.fat-option-card.fat-upgrade.on{border-color:var(--gold);background:var(--gold-bg)}
+.fat-option-card .fo-left{display:flex;flex-direction:column;gap:3px;flex:1}
+.fat-option-card .fo-badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600;background:var(--accent);color:#fff;width:fit-content}
+.fat-option-card .fo-badge.upgrade{background:var(--gold);color:#fff}
+.fat-option-card .fo-name{font-size:14px;font-weight:600;color:var(--text)}
+.fat-option-card.on .fo-name{color:var(--accent)}
+.fat-option-card.fat-upgrade.on .fo-name{color:var(--gold)}
+.fat-option-card .fo-desc{font-size:11px;color:var(--text3);line-height:1.4}
+.fat-option-card .fo-check{font-size:18px;color:transparent;transition:color .15s;flex-shrink:0}
+.fat-option-card.on .fo-check{color:var(--accent)}
+.fat-option-card.fat-upgrade.on .fo-check{color:var(--gold)}
+
+.how{font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.7}
+.how b{color:var(--text2)}
+
+/* Customization */
+.custom-section{margin-top:12px;padding:12px;background:#fafaf7;border-radius:10px}
+.custom-section .cs-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.custom-option{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;color:var(--text2)}
+.custom-option input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0}
+.custom-option input[type="text"]{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none}
+.custom-option input[type="text"]:focus{border-color:var(--accent)}
+
+.submit{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s;letter-spacing:1px}
+.submit:active{transform:scale(.98);opacity:.9}
+
+/* Result */
+.res{display:none;margin-top:18px;animation:slideUp .3s ease}
+.res.show{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.res-hero{text-align:center;padding:24px 16px;background:linear-gradient(135deg,var(--accent-bg),var(--accent2-bg));border-radius:var(--radius);margin-bottom:12px}
+.res-hero .size{font-size:56px;font-weight:700;color:var(--accent);line-height:1}
+.res-hero .unit{font-size:14px;color:var(--text2);margin-top:6px}
+.res-hero .tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;margin-top:10px}
+.res-hero .tag.tight{background:var(--accent-bg);color:var(--accent)}
+.res-hero .tag.loose{background:var(--accent2-bg);color:var(--accent2)}
+
+.res-options{padding:14px;background:#fafaf7;border-radius:10px;margin-bottom:12px}
+.res-options .ro-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+
+.res-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+.res-table th{text-align:left;padding:8px 4px;border-bottom:1.5px solid var(--border);font-weight:500;color:var(--text3);font-size:10px}
+.res-table td{padding:7px 4px;border-bottom:.5px solid #f0efe8}
+.res-table .v{font-family:"SF Mono",Monaco,"Courier New",monospace;font-size:13px}
+.res-table .ok{color:var(--accent);font-weight:500}
+.res-table .warn{color:var(--warn);font-weight:500}
+.res-table .bad{color:var(--danger);font-weight:500}
+.res-tip{font-size:11px;color:var(--text3);padding:10px 12px;background:#fafaf7;border-radius:8px;line-height:1.7;margin-top:8px}
+
+/* Add to cart btn */
+.add-cart{width:100%;padding:14px;border:2px solid var(--accent);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;background:var(--card);color:var(--accent);transition:all .15s;margin-top:10px;letter-spacing:1px}
+.add-cart:active{transform:scale(.98);background:var(--accent-bg)}
+.add-cart.added{background:var(--accent);color:#fff;pointer-events:none}
+
+.foot{text-align:center;font-size:10px;color:var(--text3);padding:16px 0;letter-spacing:1px}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:100;justify-content:center;align-items:flex-end}
+.modal-bg.show{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:12px;text-align:center}
+.modal table{width:100%;border-collapse:collapse;font-size:11px}
+.modal th{padding:6px 4px;border-bottom:1.5px solid var(--border);font-weight:500;color:var(--text3);font-size:10px;text-align:center}
+.modal td{padding:5px 4px;border-bottom:.5px solid #f0efe8;text-align:center;font-family:monospace;font-size:11px}
+.modal td:first-child{text-align:left;font-family:inherit;font-weight:500;color:var(--text2)}
+.modal .highlight{background:var(--accent-bg);font-weight:600}
+.modal .close{text-align:center;padding:14px;cursor:pointer;font-size:13px;font-weight:500;color:var(--accent);margin-top:8px}
+
+/* Coach / Cart */
+.coach-empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.coach-empty .ce-icon{font-size:40px;margin-bottom:8px}
+.coach-empty .ce-text{font-size:13px}
+.coach-empty .ce-hint{font-size:11px;margin-top:4px}
+.coach-list{margin-top:0}
+.coach-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.coach-item .ci-info{flex:1;min-width:0}
+.coach-item .ci-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px}
+.coach-item .ci-detail{font-size:11px;color:var(--text3);margin-top:2px}
+.coach-item .ci-size{font-size:18px;font-weight:700;color:var(--accent);min-width:40px;text-align:center}
+.coach-item .ci-del{width:28px;height:28px;border-radius:50%;border:none;background:var(--danger-bg);color:var(--danger);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.coach-item .ci-del:active{transform:scale(.9)}
+
+.coach-summary{background:linear-gradient(135deg,var(--accent-bg),var(--accent2-bg));border-radius:var(--radius);padding:18px;margin-top:16px}
+.coach-summary h4{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:10px;text-align:center}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.summary-item{text-align:center;background:var(--card);border-radius:10px;padding:10px 6px}
+.summary-item .si-size{font-size:22px;font-weight:700;color:var(--accent)}
+.summary-item .si-count{font-size:11px;color:var(--text2);margin-top:2px}
+.summary-item .si-zero{opacity:.35}
+
+/* Action buttons in cart */
+.coach-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.coach-actions button{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;min-width:0}
+.btn-copy{background:var(--accent);color:#fff}
+.btn-copy:active{transform:scale(.98)}
+.btn-excel{background:var(--purple);color:#fff}
+.btn-excel:active{transform:scale(.98)}
+.btn-clear{background:var(--danger-bg);color:var(--danger)}
+.btn-clear:active{transform:scale(.98)}
+.btn-order{background:var(--gold);color:#fff}
+.btn-order:active{transform:scale(.98)}
+.coach-count{text-align:center;font-size:12px;color:var(--text3);margin-top:8px}
+
+/* Discount badge */
+.discount-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;margin-left:6px}
+.discount-badge.vip{background:var(--gold-bg);color:var(--gold)}
+.discount-badge.silver{background:var(--accent2-bg);color:var(--accent2)}
+.discount-badge.bronze{background:var(--accent-bg);color:var(--accent)}
+.discount-badge.gold{background:var(--gold-bg);color:var(--gold)}
+.discount-badge.platinum{background:var(--purple-bg);color:var(--purple)}
+.discount-badge.diamond{background:linear-gradient(135deg,#E1F5EE,#F0EAFF);color:var(--accent)}
+
+/* Scheme selection */
+.scheme-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.scheme-card{min-width:90px;padding:8px;border-radius:10px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:all .15s;background:var(--card);flex-shrink:0}
+.scheme-card.on{border-color:var(--accent);background:var(--accent-bg)}
+.scheme-card .s-img{width:54px;height:54px;border-radius:6px;object-fit:cover;margin:0 auto 4px;display:block;background:var(--bg)}
+.scheme-card .s-img-placeholder{width:54px;height:54px;border-radius:6px;background:var(--bg);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.scheme-card .s-name{font-size:10px;font-weight:600;color:var(--text2)}
+.scheme-card.on .s-name{color:var(--accent)}
+.scheme-card .s-label{font-size:9px;color:var(--text3)}
+
+/* Fabric selection */
+.fabric-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.fabric-card{min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:all .15s;background:var(--card);flex-shrink:0}
+.fabric-card.on{border-color:var(--purple);background:var(--purple-bg)}
+.fabric-card .f-icon{font-size:22px;display:block;margin-bottom:2px}
+.fabric-card .f-name{font-size:10px;font-weight:600;color:var(--text2);line-height:1.3}
+.fabric-card.on .f-name{color:var(--purple)}
+.fabric-card .f-desc{font-size:9px;color:var(--text3);margin-top:2px;line-height:1.2}
+
+/* Scheme management modal */
+.scheme-mgr-list{margin-top:12px}
+.scheme-mgr-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px}
+.scheme-mgr-item .sm-img{width:60px;height:60px;border-radius:8px;object-fit:cover;background:var(--card);border:1px solid var(--border);flex-shrink:0}
+.scheme-mgr-item .sm-img-placeholder{width:60px;height:60px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.sm-info{flex:1}
+.sm-info input{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:6px;outline:none}
+.sm-upload{color:var(--accent);cursor:pointer;font-size:12px;font-weight:500}
+.sm-remove{color:var(--danger);cursor:pointer;font-size:12px;margin-left:10px}
+
+/* Share modal */
+.share-modal-content{padding:16px 0}
+.share-modal-content .share-hint{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7}
+.share-url-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;word-break:break-all;color:var(--accent);margin-bottom:12px;cursor:pointer}
+.share-url-box:active{background:var(--accent-bg)}
+.share-copy-btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;margin-bottom:10px}
+.share-copy-btn:active{transform:scale(.98)}
+.share-tip{font-size:11px;color:var(--text3);text-align:center;margin-top:8px}
+
+/* Floating buttons */
+.float-btns{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.float-btn{width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.float-btn:active{transform:scale(.95)}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;animation:fadeIn .2s ease;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Sync indicator */
+.sync-indicator{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);margin-left:8px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#4caf50}
+.sync-dot.offline{background:#ccc}
+.sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* File input hidden */
+#fileInput{display:none}
+
+/* Order success */
+.order-success{text-align:center;padding:20px}
+.order-success .os-icon{font-size:48px;margin-bottom:8px}
+.order-success .os-title{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.order-success .os-detail{font-size:13px;color:var(--text2);line-height:1.8}
+
+/* Confirm dialog */
+.confirm-dialog{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:300;justify-content:center;align-items:center}
+.confirm-dialog.show{display:flex}
+.confirm-box{background:var(--card);border-radius:16px;padding:24px;max-width:320px;width:90%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.confirm-box .cb-icon{font-size:36px;margin-bottom:8px}
+.confirm-box .cb-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.confirm-box .cb-msg{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+.confirm-box .cb-btns{display:flex;gap:10px}
+.confirm-box .cb-btn{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none}
+.confirm-box .cb-cancel{background:var(--bg);color:var(--text2)}
+.confirm-box .cb-ok{background:var(--accent);color:#fff}
+.confirm-box .cb-ok.danger{background:var(--danger)}
+.confirm-box .cb-btn:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+
+<!-- 调试面板已移除 -->
+<div class="page">
+  <div id="adminBar" style="display:none;background:var(--purple-bg);color:var(--purple);text-align:center;padding:5px;font-size:11px;font-weight:600">🔑 管理员模式 · <span style="cursor:pointer;text-decoration:underline" onclick="document.getElementById('adminModal').classList.add('show')">团队管理</span> · <span style="cursor:pointer;text-decoration:underline" onclick="adminLogout()">退出</span></div>
+  <div class="header">
+    <h1>速滑服专用智能选码系统</h1>
+    <p>连体款</p>
+  </div>
+
+  <!-- 团队码输入/显示区域 -->
+  <div id="teamSection"></div>
+
+  <!-- 品类选择 -->
+  <div class="prod-seg" id="prodSeg"></div>
+
+  <!-- 儿童/成人 -->
+  <div class="seg" id="ageSeg">
+    <div class="seg-item on" data-v="child">👦 儿童款</div>
+    <div class="seg-item" data-v="adult">👨 成人款</div>
+  </div>
+
+  <!-- 模式切换 -->
+  <div class="mode-switch">
+    <div class="mode-btn on" data-v="easy">
+      <div class="m-icon">📏</div>
+      <div class="m-title">量身高体重</div>
+      <div class="m-sub">家长/教练 快速选码</div>
+    </div>
+    <div class="mode-btn" data-v="pro">
+      <div class="m-icon">📐</div>
+      <div class="m-title">量三围数据</div>
+      <div class="m-sub">精准匹配 合身推荐</div>
+    </div>
+    <div class="mode-btn" data-v="coach">
+      <div class="m-icon">📋</div>
+      <div class="m-title">选购清单</div>
+      <div class="m-sub">查看汇总 · 下单</div>
+      <div class="badge" id="coachBadge">0</div>
+    </div>
+  </div>
+
+  <!-- 方式1：身高体重 -->
+  <div class="card" id="cardEasy">
+    <div class="fg">
+      <label>队员姓名 <span class="req">*</span> <span class="hint">（必填，重复姓名无法添加）</span></label>
+      <input type="text" id="iName1" placeholder="如：张小明">
+    </div>
+    <div class="row">
+      <div class="fg">
+        <label>身高 cm <span class="req">*</span> <span class="hint" id="hHint">（儿童：110~155）</span></label>
+        <input type="number" id="iH" placeholder="110~155" min="110" max="155" step="1">
+      </div>
+      <div class="fg">
+        <label>体重 kg <span class="hint">（选填）</span></label>
+        <input type="number" id="iW" placeholder="可选">
+        <div id="wtRefHint" style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.5"></div>
+      </div>
+    </div>
+    <div class="how">💡 只需身高即可推荐；填体重可判断是否加大尺码<br>标准路线：超标≤8kg不加码，每超8kg +1码<br>加肥路线(+¥20)：8~16kg加肥不加码，≥16kg每8kg +1码+加肥</div>
+    <div style="margin:10px 0 4px;font-size:12px;font-weight:600;color:var(--text2)">🏷️ 选择版型</div>
+    <div class="fat-option-row" id="fatRowEasy">
+      <div class="fat-option-card on" data-fat="0" onclick="selectFat(this,false)">
+        <div class="fo-left">
+          <span class="fo-badge">👍 推荐</span>
+          <span class="fo-name">标准款</span>
+          <span class="fo-desc">按身高体重正常推荐尺码，不加价</span>
+        </div>
+        <span class="fo-check">✓</span>
+      </div>
+      <div class="fat-option-card fat-upgrade" data-fat="1" onclick="selectFat(this,true)">
+        <div class="fo-left">
+          <span class="fo-badge upgrade">💰 +¥20</span>
+          <span class="fo-name">加肥定制版</span>
+          <span class="fo-desc">同码数加大胸围/臀围/大腿围，额外付费</span>
+        </div>
+        <span class="fo-check">✓</span>
+      </div>
+    </div>
+    <button class="submit" onclick="calc()">🔍 推荐尺码</button>
+  </div>
+
+  <!-- 方式2：三围 -->
+  <div class="card" id="cardPro" style="display:none">
+    <div class="fg">
+      <label>队员姓名 <span class="req">*</span> <span class="hint">（必填，重复姓名无法添加）</span></label>
+      <input type="text" id="iName2" placeholder="如：张小明">
+    </div>
+    <div class="fg">
+      <label>胸围 cm <span class="req">*</span> <span class="hint">（整围，即量一圈的数值）</span></label>
+      <input type="number" id="iC" placeholder="儿童50~80 / 成人70~120">
+    </div>
+    <div class="row">
+      <div class="fg">
+        <label>臀围 cm <span class="req">*</span></label>
+        <input type="number" id="iHp" placeholder="整围">
+      </div>
+      <div class="fg">
+        <label>大腿围 cm <span class="req">*</span></label>
+        <input type="number" id="iT" placeholder="整围">
+      </div>
+    </div>
+    <div style="margin:10px 0 4px;font-size:12px;font-weight:600;color:var(--text2)">🏷️ 选择版型</div>
+    <div class="fat-option-row" id="fatRowPro">
+      <div class="fat-option-card on" data-fat="0" onclick="selectFatPro(this,false)">
+        <div class="fo-left">
+          <span class="fo-badge">👍 推荐</span>
+          <span class="fo-name">标准款</span>
+          <span class="fo-desc">竞技贴身剪裁，不加价</span>
+        </div>
+        <span class="fo-check">✓</span>
+      </div>
+      <div class="fat-option-card fat-upgrade" data-fat="1" onclick="selectFatPro(this,true)">
+        <div class="fo-left">
+          <span class="fo-badge upgrade">💰 +¥20</span>
+          <span class="fo-name">加肥定制版</span>
+          <span class="fo-desc">三围尺寸放大，额外付费</span>
+        </div>
+        <span class="fo-check">✓</span>
+      </div>
+    </div>
+    <button class="submit" onclick="calc()">🔍 推荐尺码</button>
+  </div>
+
+  <!-- 结果展示 -->
+  <div class="res" id="res">
+    <div class="res-hero">
+      <div class="size" id="rSize">—</div>
+      <div class="unit" id="rLabel">推荐尺码</div>
+      <div class="tag" id="rTag">—</div>
+    </div>
+    <div class="res-options">
+    </div>
+    <div class="custom-section">
+      <div class="cs-title">🖊️ 定制内容（选填）</div>
+      <div class="custom-option">
+        <input type="checkbox" id="cName" onchange="toggleCustom('cNameInput',this.checked)">
+        <label for="cName">印选手姓名</label>
+        <input type="text" id="cNameInput" placeholder="如：张小明" disabled>
+      </div>
+      <div class="custom-option">
+        <input type="checkbox" id="cNumber" onchange="toggleCustom('cNumberInput',this.checked)">
+        <label for="cNumber">印号码</label>
+        <input type="text" id="cNumberInput" placeholder="如：07" disabled>
+      </div>
+      <div class="custom-option">
+        <input type="checkbox" id="cLogo" onchange="toggleCustom('cLogoInput',this.checked)">
+        <label for="cLogo">印队标/Logo</label>
+        <input type="text" id="cLogoInput" placeholder="如：左胸 / 后背" disabled>
+      </div>
+      <div class="custom-option">
+        <input type="checkbox" id="cRemark" onchange="toggleCustom('cRemarkInput',this.checked)">
+        <label for="cRemark">备注说明</label>
+        <input type="text" id="cRemarkInput" placeholder="其他定制需求" disabled>
+      </div>
+    </div>
+    <table class="res-table" id="rTable">
+      <thead id="rHead"><tr><th>部位</th><th>孩子尺寸</th><th>成品尺寸</th><th>松量</th></tr></thead>
+      <tbody id="rBody"></tbody>
+    </table>
+    <div class="res-tip" id="rTip"></div>
+    <button class="add-cart" id="btnAddCart" onclick="addToCart()">✅ 确认尺码，加入选购清单</button>
+  </div>
+
+  <!-- 选购清单视图 -->
+  <div class="card" id="cardCoach" style="display:none">
+    <div id="coachContent"></div>
+  </div>
+
+  <div class="foot">晨哥团队队服定制 · 山东威海 · 速滑服专业定制</div>
+</div>
+
+<!-- 尺码对照弹窗 -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle">尺码对照表</h3>
+    <div id="modalContent"></div>
+    <div class="close" onclick="closeModal()">关闭</div>
+  </div>
+</div>
+
+<!-- 方案管理弹窗 -->
+<div class="modal-bg" id="schemeModal" onclick="if(event.target===this)closeSchemeModal()">
+  <div class="modal">
+    <h3>🎨 管理方案效果图</h3>
+    <div class="scheme-mgr-list" id="schemeMgrList"></div>
+    <div class="close" onclick="closeSchemeModal()">完成</div>
+  </div>
+</div>
+
+<!-- 分享给家长弹窗 -->
+<div class="modal-bg" id="shareModal" onclick="if(event.target===this)closeShareModal()">
+  <div class="modal">
+    <h3>📤 分享给家长自助选码</h3>
+    <div class="share-modal-content">
+      <div class="share-hint">
+        将下方链接发给家长，家长打开后填写孩子信息自助选码。<br>
+        家长提交的数据会<strong>自动同步</strong>到你的选购清单中！
+      </div>
+      <div class="share-url-box" id="shareUrlBox" onclick="copyShareUrl()">
+        点击此处复制链接
+      </div>
+      <button class="share-copy-btn" onclick="copyShareUrl()">📋 复制链接</button>
+      <div class="share-tip">💡 家长打开链接后填写信息，选码结果会自动同步到你的清单</div>
+    </div>
+    <div class="close" onclick="closeShareModal()">关闭</div>
+  </div>
+</div>
+
+<!-- 创建团队码弹窗 -->
+<div class="modal-bg" id="createTeamModal" onclick="if(event.target===this)closeCreateTeamModal()">
+  <div class="modal">
+    <div class="create-team-form">
+      <div class="ctf-title">🏷️ 创建我的专属码</div>
+      <div class="ctf-desc">团队码是你的专属代码，6位字母数字组合<br>用于统计消费次数、享受折扣优惠</div>
+      <div class="fg">
+        <label>团队码 <span class="req">*</span> <span class="hint">（6位，字母数字组合）</span></label>
+        <input type="text" id="newTeamCode" placeholder="如：A3B9K2" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;text-align:center">
+      </div>
+      <div class="fg">
+        <label>晨哥姓名 <span class="req">*</span></label>
+        <input type="text" id="newCoachName" placeholder="如：晨哥">
+      </div>
+      <div class="fg">
+        <label>手机号 <span class="hint">（选填）</span></label>
+        <input type="tel" id="newCoachPhone" placeholder="如：13800138000">
+      </div>
+      <button class="ctf-submit" onclick="submitCreateTeam()">✨ 创建专属码</button>
+      <div class="ctf-hint">💡 专属码创建后不可更改，请牢记您的团队码</div>
+    </div>
+    <div class="close" onclick="closeCreateTeamModal()">取消</div>
+  </div>
+</div>
+
+<!-- 下单成功弹窗 -->
+<div class="modal-bg" id="orderSuccessModal" onclick="if(event.target===this)closeOrderSuccessModal()">
+  <div class="modal">
+    <div class="order-success">
+      <div class="os-icon">📦</div>
+      <div class="os-title">下单成功！</div>
+      <div class="os-detail" id="orderSuccessDetail"></div>
+    </div>
+    <div class="close" onclick="closeOrderSuccessModal()">确定</div>
+  </div>
+</div>
+
+<!-- 下单配置弹窗（面料/缝纫/备注） -->
+<div class="modal-bg" id="orderConfigModal" onclick="if(event.target===this)document.getElementById('orderConfigModal').classList.remove('show')">
+  <div class="modal">
+    <h3>⚙️ 下单配置</h3>
+    <div style="margin:12px 0">
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🧵 选择面料</div>
+      <div class="fabric-row" id="configFabricRow"></div>
+    </div>
+    <div style="margin:12px 0">
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🪡 缝纫工艺</div>
+      <div id="configStitchRow" style="display:flex;gap:8px"></div>
+    </div>
+    <div style="margin:12px 0">
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">📝 备注说明</div>
+      <textarea id="configRemark" rows="3" placeholder="如：加急、特殊包装、颜色备注等" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);resize:none"></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="close" style="flex:1;color:var(--text2)" onclick="document.getElementById('orderConfigModal').classList.remove('show')">取消</div>
+      <div class="close" style="flex:2;background:var(--accent);color:#fff" onclick="confirmOrderConfig()">确认，提交订单</div>
+    </div>
+  </div>
+</div>
+
+<!-- 收货地址弹窗 -->
+<div class="modal-bg" id="addressModal" onclick="if(event.target===this)document.getElementById('addressModal').classList.remove('show')">
+  <div class="modal">
+    <h3>📍 填写收货地址</h3>
+    <div style="margin:16px 0">
+      <div style="margin-bottom:12px">
+        <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">收货人 *</label>
+        <input type="text" id="shipName" placeholder="请输入收货人姓名" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg)">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">联系电话 *</label>
+        <input type="tel" id="shipPhone" placeholder="请输入手机号码" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg)">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">详细地址 *</label>
+        <textarea id="shipAddr" rows="3" placeholder="省/市/区/街道/门牌号" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);resize:none"></textarea>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">💡 地址信息会自动保存，下次下单无需重复填写</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="close" style="flex:1;color:var(--text2)" onclick="document.getElementById('addressModal').classList.remove('show')">取消</div>
+      <div class="close" style="flex:2;background:var(--accent);color:#fff" onclick="submitOrder()">确认下单</div>
+    </div>
+  </div>
+</div>
+
+<!-- 订单管理弹窗 -->
+<div class="modal-bg" id="ordersModal" onclick="if(event.target===this)closeOrdersModal()">
+  <div class="modal" style="max-height:85vh">
+    <h3>📦 订单管理</h3>
+    <div id="ordersContent"></div>
+    <div class="close" onclick="closeOrdersModal()">关闭</div>
+  </div>
+</div>
+
+<!-- 订单详情/导出弹窗 -->
+<div class="modal-bg" id="orderDetailModal" onclick="if(event.target===this)document.getElementById('orderDetailModal').classList.remove('show')">
+  <div class="modal" style="max-height:90vh">
+    <h3>📋 订单详情</h3>
+    <div id="orderDetailContent"></div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <div class="close" style="flex:1" onclick="document.getElementById('orderDetailModal').classList.remove('show')">关闭</div>
+      <div class="close" style="flex:1;background:var(--accent);color:#fff" onclick="exportCurrentOrder()">📥 导出Excel</div>
+    </div>
+  </div>
+</div>
+
+<!-- 隐藏文件上传 -->
+<input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+
+<!-- 自定义确认弹窗（替代confirm） -->
+<div class="confirm-dialog" id="confirmDialog">
+  <div class="confirm-box">
+    <div class="cb-icon" id="confirmIcon">⚠️</div>
+    <div class="cb-title" id="confirmTitle">确认操作</div>
+    <div class="cb-msg" id="confirmMsg"></div>
+    <div class="cb-btns">
+      <button class="cb-btn cb-cancel" id="confirmCancel" onclick="closeConfirm()">取消</button>
+      <button class="cb-btn cb-ok" id="confirmOk" onclick="handleConfirmOk()">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 下单进度覆盖层 -->
+<div id="orderProgressOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;justify-content:center;align-items:center">
+  <div style="background:var(--card);border-radius:16px;padding:28px 24px;max-width:300px;width:85%;text-align:center">
+    <div style="font-size:28px;margin-bottom:12px">⏳</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">正在创建订单</div>
+    <div style="text-align:left;margin-bottom:12px">
+      <div class="op-step pending" style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text3)">
+        <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">1</span>
+        准备订单数据
+      </div>
+      <div class="op-step pending" style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text3)">
+        <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">2</span>
+        写入云端数据库
+      </div>
+      <div class="op-step pending" style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text3)">
+        <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">3</span>
+        清空选购清单
+      </div>
+      <div class="op-step pending" style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text3)">
+        <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">4</span>
+        完成
+      </div>
+    </div>
+    <div class="op-msg" style="font-size:12px;color:var(--text3);margin-top:8px">请稍候...</div>
+  </div>
+</div>
+<style>
+.op-step.done{color:var(--accent)!important}
+.op-step.done>span{background:var(--accent);border-color:var(--accent);color:#fff}
+.op-step.active{color:var(--text)!important;font-weight:600}
+.op-step.active>span{border-color:var(--accent);color:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.op-step.pending{color:var(--text3)}
+.op-step.pending>span{border-color:var(--border);color:var(--text3)}
+</style>
+
+<!-- 浮动按钮 -->
+<div class="float-btns">
+  <div class="float-btn" onclick="openOrdersModal()" title="订单管理">📦</div>
+  <div class="float-btn" onclick="openSchemeModal()" title="管理方案">⚙️</div>
+  <div class="float-btn" onclick="openShareModal()" title="分享给家长">📤</div>
+  <div class="float-btn" id="adminBtn" onclick="adminLogin()" title="管理员" style="width:36px;height:36px;font-size:14px;opacity:.5">🔑</div>
+</div>
+
+<script>
+// ===== Supabase 配置 =====
+var SB_URL='https://hndguaogudhribyimyrg.supabase.co';
+var SB_KEY='sb_publishable_ZDRzwrdUVmLKqo-Yht-03w_zy6u9iWP';
+var sb=null;
+var sbConnected=false;
+try{
+  if(!window.supabase||window.__sbLoadFailed){throw new Error('Supabase JS库未加载，请检查网络后刷新')}
+  sb=window.supabase.createClient(SB_URL,SB_KEY);
+  console.log('[Supabase] 初始化完成, sb=',!!sb);
+  // 验证连接是否真正可用
+  sb.from('team_profiles').select('team_code').limit(1).then(function(r){
+    if(r.error){
+      console.error('[Supabase] 连接测试失败:',r.error);
+      sbConnected=false;
+    }else{
+      console.log('[Supabase] 连接测试成功, 数据条数:',r.data?r.data.length:0);
+      sbConnected=true;
+    }
+    // 连接状态变化时刷新团队区域
+    if(typeof renderTeamSection==='function') renderTeamSection();
+  });
+}catch(e){
+  console.warn('Supabase init failed',e);
+  sbConnected=false;
+}
+
+// ===== 配置 =====
+var SHRINK=0.97;
+
+var CHILD_SIZES=[110,120,130,140,150,155];
+var ADULT_SIZES=[160,165,170,175,180,185,190];
+
+var D={
+  child:{
+    sizes:CHILD_SIZES,
+    data:{
+      110:{0:27.3,1:19.5,2:17.5,3:17.5,4:46,5:27.8,6:50,7:20,8:20,9:46,10:32,11:50,12:19.5,13:17.5,14:17.5,15:46,16:27.3,17:50,18:20,19:20,20:46},
+      120:{0:28.9,1:20.5,2:18.5,3:18.5,4:48,5:29.4,6:52,7:21,8:21,9:48,10:35.1,11:52,12:20.5,13:18.5,14:18.5,15:48,16:28.9,17:52,18:21,19:21,20:48},
+      130:{0:30.9,1:21.5,2:20.5,3:20.5,4:50,5:32.0,6:54,7:22,8:22,9:50,10:38.1,11:54,12:21.5,13:20.5,14:20.5,15:50,16:30.9,17:54,18:22,19:22,20:50},
+      140:{0:33.0,1:23.5,2:22,3:22,4:54,5:34.0,6:58,7:24,8:24,9:54,10:41.2,11:58,12:23.5,13:22,14:22,15:54,16:33.0,17:58,18:24,19:24,20:54},
+      150:{0:35.1,1:25.5,2:24,3:24,4:58,5:36.1,6:62,7:26,8:26,9:58,10:45.4,11:62,12:25.5,13:24,14:24,15:58,16:35.1,17:62,18:26,19:26,20:58},
+      155:{0:36.1,1:26.5,2:25,3:25,4:60,5:37.1,6:64,7:27,8:27,9:60,10:46.4,11:64,12:26.5,13:25,14:25,15:60,16:36.1,17:64,18:27,19:27,20:60}
+    },
+    keyMap:{chest:0,hip:5,thigh:10},
+    halfIdx:new Set([0,1,2,3,5,7,8,12,13,14,16,17,18,19]),
+    wtRef:{110:{m:17,f:21},120:{m:21,f:25},130:{m:25,f:30},140:{m:30,f:37},150:{m:37,f:45},155:{m:40,f:49}},
+    bodyRef:{110:{chest:57,hip:61,thigh:34},120:{chest:60,hip:64,thigh:37},130:{chest:64,hip:69,thigh:40},140:{chest:68,hip:73,thigh:43},150:{chest:72,hip:77,thigh:47},155:{chest:74,hip:79,thigh:48}}
+  },
+  adult:{
+    sizes:ADULT_SIZES,
+    data:{
+      160:{0:42.3,1:13.35,2:13.35,3:12,4:35,5:42.8,6:35,7:43,8:13.35,9:13.35,10:47.4,11:43,12:42.3,13:13.35,14:13.35,15:12,16:35,17:43,18:35,19:43,20:81.2},
+      165:{0:43.3,1:14.35,2:14.35,3:12.5,4:36,5:44.3,6:36,7:44.5,8:14.35,9:14.35,10:49.5,11:44.5,12:43.3,13:14.35,14:14.35,15:12.5,16:36,17:44.5,18:36,19:44.5,20:81.2},
+      170:{0:44.8,1:15.35,2:15.35,3:13,4:37,5:45.9,6:37,7:46,8:15.35,9:15.35,10:51.5,11:46,12:44.8,13:15.35,14:15.35,15:13,16:37,17:46,18:37,19:46,20:81.2},
+      175:{0:46.4,1:16.35,2:16.35,3:13.5,4:38,5:47.4,6:38,7:47.5,8:16.35,9:16.35,10:53.6,11:47.5,12:46.4,13:16.35,14:16.35,15:13.5,16:38,17:47.5,18:38,19:47.5,20:81.2},
+      180:{0:47.4,1:17.35,2:17.35,3:14,4:39,5:49.0,6:39,7:49,8:17.35,9:17.35,10:55.7,11:49,12:47.4,13:17.35,14:17.35,15:14,16:39,17:49,18:39,19:49,20:81.2},
+      185:{0:49.0,1:18.35,2:18.35,3:14.5,4:40,5:50.0,6:40,7:50.5,8:18.35,9:18.35,10:56.7,11:50.5,12:49.0,13:18.35,14:18.35,15:14.5,16:40,17:50.5,18:40,19:50.5,20:81.2},
+      190:{0:50.5,1:19.35,2:19.35,3:15,4:41,5:51.5,6:41,7:52,8:19.35,9:19.35,10:58.8,11:52,12:50.5,13:19.35,14:19.35,15:15,16:41,17:52,18:41,19:52,20:81.2}
+    },
+    keyMap:{chest:0,hip:5,thigh:10},
+    halfIdx:new Set([0,1,2,3,5,9,11,12,13,14,16,17,18,19]),
+    wtRef:{160:{m:50,f:55},165:{m:52,f:58},170:{m:56,f:62},175:{m:59,f:65},180:{m:62,f:68},185:{m:65,f:71},190:{m:69,f:75}},
+    bodyRef:{160:{chest:86,hip:90,thigh:49},165:{chest:88,hip:93,thigh:51},170:{chest:91,hip:96,thigh:53},175:{chest:94,hip:99,thigh:55},180:{chest:96,hip:102,thigh:57},185:{chest:99,hip:104,thigh:58},190:{chest:102,hip:107,thigh:60}}
+  }
+};
+
+// ===== 单价 & 权益体系 =====
+var UNIT_PRICE=0; // 价格由晨哥手动填写，不再自动计算
+
+var BENEFIT_LEVELS=[
+  {minAmount:0,   label:'基础',  freeShip:false,iceTowel:0, discount:1.0, badge:'bronze'},
+  {minAmount:20,  label:'银卡',  freeShip:true, iceTowel:5, discount:1.0, badge:'silver'},
+  {minAmount:30,  label:'金卡',  freeShip:true, iceTowel:10,discount:1.0, badge:'gold'},
+  {minAmount:40,  label:'铂金',  freeShip:true, iceTowel:20,discount:1.0, badge:'platinum'},
+  {minAmount:50,  label:'钻石',  freeShip:true, iceTowel:20,discount:1.0,freeSample:true, badge:'diamond'}
+];
+
+function getBenefitLevel(amount){
+  var level=BENEFIT_LEVELS[0];
+  for(var i=0;i<BENEFIT_LEVELS.length;i++){
+    if(amount>=BENEFIT_LEVELS[i].minAmount) level=BENEFIT_LEVELS[i];
+  }
+  return level;
+}
+
+function getBenefitText(level){
+  var perks=[];
+  if(level.freeShip) perks.push('包邮');
+  if(level.iceTowel>0) perks.push('赠运动冰巾×'+level.iceTowel);
+  if(level.freeSample) perks.push('免费设计打样样衣×1');
+  if(level.discount<1) perks.push('全场'+(level.discount*100).toFixed(0)+'%');
+  return perks.length>0?perks.join(' + '):'暂无权益';
+}
+
+function getNextBenefitHint(amount){
+  for(var i=0;i<BENEFIT_LEVELS.length;i++){
+    if(amount<BENEFIT_LEVELS[i].minAmount){
+      var diff=BENEFIT_LEVELS[i].minAmount-amount;
+      return '再满'+diff+'件可享「'+BENEFIT_LEVELS[i].label+'」'+getBenefitText(BENEFIT_LEVELS[i]);
+    }
+  }
+  return '已达最高权益等级';
+}
+
+// 兼容旧引用
+var DISCOUNT_LEVELS=BENEFIT_LEVELS;
+function getDiscountLevel(totalOrders){return BENEFIT_LEVELS[0]}
+
+// ===== 状态 =====
+var age='child', mode='easy', fit='tight', addFat=false;
+var lastResult=null;
+var cartData=[];
+var schemes=[];
+var currentScheme=null;
+// 面料选项
+var fabrics=[
+  {id:'f1',name:'普通莱卡面料',icon:'👕',desc:'高端防水透气'},
+  {id:'f2',name:'耐勾丝莱卡面料',icon:'🛡️',desc:'标准运动面料'},
+  {id:'f3',name:'高端肌理莱卡面料',icon:'✨',desc:'高弹舒适'}
+];
+var currentFabric=fabrics[0].id;
+var stitchOptions=[
+  {id:'st3',name:'四线',icon:'🧵',desc:'弹性好·适合针织'},
+  {id:'st2',name:'三针五线',icon:'👍',desc:'标准运动缝纫'},
+  {id:'st1',name:'四针六线',icon:'🏆',desc:'专业运动缝纫·平整牢固'}
+];
+var currentStitch=stitchOptions[0].id;
+function renderFabricRow(){
+  var el=document.getElementById('fabricRow');
+  if(!el) return;
+  var html='';
+  fabrics.forEach(function(f){
+    var on=f.id===currentFabric?'on':'';
+    html+='<div class="fabric-card '+on+'" onclick="selectFabric(\''+f.id+'\')">'
+      +'<span class="f-icon">'+f.icon+'</span>'
+      +'<div class="f-name">'+f.name.replace(/\n/g,'<br>')+'</div>'
+      +'<div class="f-desc">'+f.desc+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+function selectFabric(id){
+  currentFabric=id;
+  renderFabricRow();
+}
+var teamCode=localStorage.getItem('cg_team')||'';
+var teamProfile=null; // {coach_name, phone, total_orders, total_amount, discount_level}
+var syncTimer=null;
+
+function loadSchemes(){
+  var key='cg_schemes'+(teamCode?'_'+teamCode:'');
+  schemes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(!schemes.length){
+    schemes=[{id:'s1',name:'方案1',imgData:null},{id:'s2',name:'方案2',imgData:null},{id:'s3',name:'方案3',imgData:null}];
+    saveSchemes();
+  }
+  currentScheme=schemes[0]?schemes[0].id:null;
+  if(typeof renderSchemeRow==='function') renderSchemeRow();
+}
+loadSchemes();
+
+// ===== 全局错误捕获 =====
+function _logDebug(msg){
+  console.log('[调试]',msg);
+  // 更新团队区域中的连接状态提示
+  var st=document.getElementById('syncStatus');
+  if(st) st.textContent=msg;
+}
+window.onerror=function(msg,src,line,col,err){
+  console.error('[全局错误]',msg,src,line,col);
+  var d=document.getElementById('globalErrorLog');
+  if(d){d.style.display='block';d.textContent='❌ '+msg+' (行'+line+')';}
+  _logDebug('❌ '+msg+' L'+line);
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  console.error('[未处理Promise]',e.reason);
+  var d=document.getElementById('globalErrorLog');
+  if(d){d.style.display='block';d.textContent='❌ Promise: '+(e.reason&&e.reason.message||e.reason);}
+  _logDebug('❌ Promise: '+(e.reason&&e.reason.message||e.reason));
+});
+
+function saveSchemes(){localStorage.setItem('cg_schemes'+(teamCode?'_'+teamCode:''),JSON.stringify(schemes))}
+
+// ===== 团队码管理 =====
+function renderTeamSection(){
+  var el=document.getElementById('teamSection');
+  if(teamCode){
+    var totalOrders=teamProfile?teamProfile.total_orders:0;
+    var totalAmount=teamProfile?parseFloat(teamProfile.total_amount||0):0;
+    var benefit=getBenefitLevel(totalAmount);
+    var coachName=teamProfile&&teamProfile.coach_name?teamProfile.coach_name:'';
+
+    // 当前购物车件数
+    var cartCount=cartData.length;
+
+    el.innerHTML='<div class="team-banner">'
+      +'<div class="tb-top">'
+      +'<div class="tb-icon">🏷️</div>'
+      +'<div class="tb-info">'
+      +'<div class="tb-label">团队码</div>'
+      +'<div class="tb-code">'+teamCode+'</div>'
+      +(coachName?'<div class="tb-coach-name">👤 '+coachName+'</div>':'')
+      +'<div class="tb-status"><span class="sync-dot '+(sb?'':'offline')+'"></span> '+(sb?'已连接云端':'离线模式')+'</div>'
+      +'</div>'
+      +'<button class="tb-exit" onclick="exitTeam()" title="退出团队码">✕</button>'
+      +'</div>'
+      +'<div class="tb-stats">'
+      +'<div class="tb-stat"><div class="tb-stat-val">'+totalOrders+'</div><div class="tb-stat-lbl">累计下单</div></div>'
+      +'<div class="tb-stat"><div class="tb-stat-val">'+totalAmount.toFixed(0)+'件</div><div class="tb-stat-lbl">累计件数</div></div>'
+      +'<div class="tb-stat"><div class="tb-stat-val" style="font-size:11px">'+(benefit.minAmount>0?benefit.label+' · '+getBenefitText(benefit):'暂无权益')+'</div><div class="tb-stat-lbl">当前权益</div></div>'
+      +'</div>'
+      +(benefit.minAmount>0?'<div class="tb-discount">🏆 '+benefit.label+'客户 · '+getBenefitText(benefit)+'</div>':'')
+      +'</div>';
+
+    // 购物车权益提示（在banner下方）
+    if(cartData.length>0&&cartCount<5000){
+      var hint=getNextBenefitHint(cartCount);
+      el.innerHTML+='<div style="background:var(--warn-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--warn);text-align:center;line-height:1.6">💡 当前'+cartCount+'件 · '+hint+'</div>';
+    }else if(cartData.length>0&&cartCount>=5000){
+      var cartBenefit2=getBenefitLevel(cartCount);
+      el.innerHTML+='<div style="background:var(--accent-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--accent);text-align:center;line-height:1.6">🏆 当前'+cartCount+'件 · 已享最高权益：'+getBenefitText(cartBenefit2)+'</div>';
+    }
+
+    // 待确认订单提示
+    el.innerHTML+='<div id="unpaidHint" style="display:none;background:var(--danger-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--danger);text-align:center;line-height:1.6"></div>';
+  }else{
+    // 查询已创建的专属码数量
+    var teamCountHtml='<span id="teamCountBadge" style="font-size:11px;color:var(--text3)">⏳</span>';
+    if(sb){
+      sb.from('team_profiles').select('id',{count:'exact',head:true}).then(function(r){
+        var badge=document.getElementById('teamCountBadge');
+        if(badge&&r.count!==undefined){
+          badge.textContent='已有 '+r.count+' 个团队在使用';
+          badge.style.color='var(--accent2)';
+        }else if(badge){
+          badge.textContent='';
+        }
+      }).catch(function(){var badge=document.getElementById('teamCountBadge');if(badge)badge.textContent='';});
+    }
+    el.innerHTML='<div class="team-input-card">'
+      +'<h3>🏷️ 输入团队码</h3>'
+      +'<p>教练创建团队码后分享给家长，数据自动同步<br>累积消费享专属权益</p>'
+      +(!sb||!sbConnected?'<div style="background:var(--warn-bg);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--warn);text-align:center">⚠️ 云端未连接，团队码功能暂不可用<br>请检查网络后刷新页面</div>':'')
+      +'<div class="team-input-row">'
+      +'<input type="text" id="teamInput" placeholder="如：A3B9K2" maxlength="6" style="text-transform:uppercase"'
+      +(!sb?' disabled':'')+' onkeydown="if(event.key===\'Enter\')joinTeam()">'
+      +'<button onclick="joinTeam()"'+(!sb?' disabled':'')+'>'+(!sb?'连接中':'加入')+'</button>'
+      +'</div>'
+      +'<div class="team-create" onclick="openCreateTeamModal()">✨ 创建我的专属码</div>'
+      +'<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3)">'+teamCountHtml+'</div>'
+      +'<div style="margin-top:14px;text-align:left;font-size:11px;color:var(--text3);line-height:1.8">'
+      +'<div style="font-weight:600;color:var(--text2);margin-bottom:4px">🎁 累计消费权益</div>'
+      +'<div>👕 满20件 → 包邮 + 赠运动冰巾×5</div>'
+      +'<div>👕 满30件 → 包邮 + 赠运动冰巾×10</div>'
+      +'<div>👕 满40件 → 包邮 + 赠运动冰巾×20</div>'
+      +'<div>💎 满50件 → 包邮 + 赠运动冰巾×20 + 免费设计打样样衣×1</div>'
+      +'</div>'
+      +'</div>';
+  }
+}
+
+function exitTeam(){
+  showConfirm({
+    icon:'🚪',
+    title:'退出团队码',
+    msg:'确定退出当前团队码吗？<br><br>退出后数据仍在云端，<br>重新输入团队码即可恢复',
+    okText:'退出',
+    danger:true,
+    onOk:function(){
+      if(syncTimer){clearInterval(syncTimer);syncTimer=null}
+      teamCode='';
+      schemes=[]; currentScheme=null;
+      teamProfile=null;
+      localStorage.removeItem('cg_team');
+      cartData=[];
+      updateBadge();
+      renderTeamSection();
+      if(mode==='coach') renderCoachView();
+      showToast('已退出团队码');
+    }
+  });
+}
+
+function joinTeam(){
+  var code=document.getElementById('teamInput').value.trim().toUpperCase();
+  _logDebug('joinTeam: code='+code);
+  if(!code){showToast('⚠️ 请输入团队码');return}
+  if(code.length!==6){showToast('⚠️ 团队码必须是6位，您输入了'+code.length+'位');document.getElementById('teamInput').focus();return}
+  if(!/^[A-Z0-9]{6}$/.test(code)){showToast('⚠️ 团队码只能包含字母和数字');document.getElementById('teamInput').focus();return}
+  showToast('⏳ 正在验证团队码...');
+  // 零售码：散客家长无需注册
+  if(code==='000000'){
+    teamCode=code;
+    loadSchemes();
+    teamProfile={team_code:'000000',coach_name:'零售客户',phone:'',total_orders:0,total_amount:0,discount_level:0};
+    localStorage.setItem('cg_team',teamCode);
+    renderTeamSection();
+    syncFromCloud();
+    startAutoSync();
+    showToast('✅ 已进入零售模式');
+    return;
+  }
+  // 检查团队码是否存在
+  checkTeamExists(code,function(result){
+    _logDebug('checkTeam返回: exists='+result.exists+', err='+result.error);
+    if(result.error){
+      showToast('❌ 验证失败：'+result.error);
+      return;
+    }
+    if(!result.exists){
+      showToast('⚠️ 团队码「'+code+'」不存在，请确认或创建新码');
+      return;
+    }
+    teamCode=code;
+    loadSchemes();
+    teamProfile=result.profile;
+    localStorage.setItem('cg_team',teamCode);
+    renderTeamSection();
+    syncFromCloud();
+    startAutoSync();
+    showToast('✅ 已加入团队：'+teamCode+(result.profile&&result.profile.coach_name?'（'+result.profile.coach_name+'）':''));
+    // 加入后自动查看历史订单
+    if(sb) openOrdersModal();
+  });
+}
+
+function checkTeamExists(code,callback){
+  if(!sb){
+    callback({exists:false,error:'未连接云端，请刷新页面重试',profile:null});
+    return;
+  }
+  sb.from('team_profiles').select('*').eq('team_code',code).then(function(resp){
+    _logDebug('Supabase查团队码: err='+!!resp.error+' len='+(resp.data?resp.data.length:'null'));
+    if(resp.error){
+      callback({exists:false,error:resp.error.message||'数据库查询失败',profile:null});
+    }else if(!resp.data||resp.data.length===0){
+      callback({exists:false,error:null,profile:null});
+    }else{
+      callback({exists:true,error:null,profile:resp.data[0]});
+    }
+  }).catch(function(e){
+    _logDebug('checkTeam网络异常: '+e.message);
+    callback({exists:false,error:'网络异常：'+(e.message||'请检查网络连接'),profile:null});
+  });
+}
+
+// 创建团队码弹窗
+function openCreateTeamModal(){
+  try{
+    document.getElementById('newTeamCode').value='';
+    document.getElementById('newCoachName').value='';
+    document.getElementById('newCoachPhone').value='';
+    document.getElementById('createTeamModal').classList.add('show');
+    setTimeout(function(){document.getElementById('newTeamCode').focus()},300);
+  }catch(e){
+    console.error('打开创建弹窗失败:',e);
+    showToast('⚠️ 页面加载异常，请刷新后重试');
+  }
+}
+function closeCreateTeamModal(){
+  document.getElementById('createTeamModal').classList.remove('show');
+}
+
+async function submitCreateTeam(){
+  var btn=document.querySelector('#createTeamModal .ctf-submit');
+  var code=document.getElementById('newTeamCode').value.trim().toUpperCase();
+  var coachName=document.getElementById('newCoachName').value.trim();
+  var coachPhone=document.getElementById('newCoachPhone').value.trim();
+
+  if(!code){showToast('⚠️ 请输入团队码');document.getElementById('newTeamCode').focus();return}
+  if(code==='000000'){showToast('⚠️ 000000 为零售专用码，不可创建');document.getElementById('newTeamCode').focus();return}
+  if(code.length!==6){showToast('⚠️ 团队码必须是6位，您输入了'+code.length+'位');document.getElementById('newTeamCode').focus();return}
+  if(!/^[A-Z0-9]{6}$/.test(code)){showToast('⚠️ 团队码只能包含字母和数字');document.getElementById('newTeamCode').focus();return}
+  if(!coachName){showToast('⚠️ 请输入晨哥姓名');document.getElementById('newCoachName').focus();return}
+
+  // 防止重复点击
+  if(btn){btn.disabled=true;btn.textContent='创建中...';}
+
+  // 检查团队码是否已被注册
+  if(sb){
+    try{
+      console.log('[创建] 检查团队码:',code);
+      var check=await sb.from('team_profiles').select('team_code').eq('team_code',code);
+      console.log('[创建] 检查结果:',check);
+      if(check.error){
+        console.error('检查团队码失败:',check.error);
+        showToast('⚠️ 检查失败：'+(check.error.message||'请检查数据库RLS策略是否允许公开访问'));if(btn){btn.disabled=false;btn.textContent='✨ 创建专属码';}return;
+      }
+      if(check.data&&check.data.length>0){
+        showToast('⚠️ 团队码「'+code+'」已被注册！请换一个试试');
+        document.getElementById('newTeamCode').focus();
+        if(btn){btn.disabled=false;btn.textContent='✨ 创建专属码';}
+        return;
+      }
+
+      // 创建团队
+      var profile={
+        team_code:code,
+        coach_name:coachName,
+        phone:coachPhone||null,
+        total_orders:0,
+        total_amount:0,
+        discount_level:0
+      };
+      console.log('[创建] 插入数据:',profile);
+      var insert=await sb.from('team_profiles').insert(profile).select();
+      console.log('[创建] 插入结果:',insert);
+      if(insert.error){
+        console.error('创建团队失败:',insert.error);
+        showToast('⚠️ 创建失败：'+insert.error.message);
+        if(btn){btn.disabled=false;btn.textContent='✨ 创建专属码';}
+        return;
+      }
+      if(!insert.data||insert.data.length===0){
+        showToast('⚠️ 创建失败：数据未写入数据库，请检查Supabase RLS策略');
+        if(btn){btn.disabled=false;btn.textContent='✨ 创建专属码';}
+        return;
+      }
+      // ✅ 创建成功
+      teamCode=code;
+      loadSchemes();
+        teamProfile=insert.data[0];
+      localStorage.setItem('cg_team',teamCode);
+      closeCreateTeamModal();
+      renderTeamSection();
+      startAutoSync();
+      showToast('🎉 专属码创建成功：'+code);
+      // 滚动到页面顶部，展示选码界面
+      window.scrollTo({top:0,behavior:'smooth'});
+    }catch(e){
+      console.error('创建团队异常:',e);
+      showToast('⚠️ 创建失败：'+(e.message||'网络错误，请重试'));
+      if(btn){btn.disabled=false;btn.textContent='✨ 创建专属码';}
+      return;
+    }
+  }else{
+    // 无Supabase连接，离线模式
+    teamCode=code;
+    loadSchemes();
+    teamProfile={team_code:code,coach_name:coachName,phone:coachPhone,total_orders:0,total_amount:0,discount_level:0};
+    localStorage.setItem('cg_team',teamCode);
+    closeCreateTeamModal();
+    renderTeamSection();
+    showToast('🎉 专属码创建成功：'+code+'（离线模式）');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
+// 加载团队信息
+async function loadTeamProfile(){
+  if(!sb||!teamCode) return;
+  try{
+    var resp=await sb.from('team_profiles').select('*').eq('team_code',teamCode);
+    if(resp.data&&resp.data.length>0){
+      teamProfile=resp.data[0];
+    }
+    // 检查待确认订单
+    var unpaidResp=await sb.from('orders').select('id').eq('team_code',teamCode).eq('status','unpaid');
+    var unpaidCount=(unpaidResp.data&&unpaidResp.data.length)||0;
+    var hint=document.getElementById('unpaidHint');
+    if(hint){
+      if(unpaidCount>0){
+        hint.style.display='block';
+        hint.innerHTML='📦 '+unpaidCount+'笔待确认订单 → <span style="cursor:pointer;text-decoration:underline" onclick="openOrdersModal()">查看</span>';
+      }else{
+        hint.style.display='none';
+      }
+    }
+    renderTeamSection();
+  }catch(e){console.warn('Load profile failed',e)}
+}
+
+// ===== 云端同步 =====
+async function syncFromCloud(){
+  if(!sb||!teamCode) return;
+  try{
+    var resp=await sb.from('cart_items').select('*').eq('team_code',teamCode).order('created_at',{ascending:true});
+    if(resp.error){console.warn('Sync error',resp.error);return}
+    cartData=resp.data.map(function(row){
+      return {
+        id:row.id,
+        name:row.name,
+        detail:row.detail||'',
+        sz:row.size,
+        age:row.age_type,
+        addFat:row.fit_type==='fat',
+        scheme:row.scheme||'',
+        custom:row.custom||[]
+      };
+    });
+    updateBadge();
+    if(mode==='coach') renderCoachView();
+  }catch(e){console.warn('Sync failed',e)}
+}
+
+async function pushToCloud(item){
+  if(!sb||!teamCode) return null;
+  try{
+    var row={
+      team_code:teamCode,
+      name:item.name,
+      detail:item.detail||null,
+      size:item.sz,
+      age_type:item.age,
+      fit_type:item.addFat?'fat':'normal',
+      scheme:item.scheme||null,
+      custom:item.custom||[]
+    };
+    var resp=await sb.from('cart_items').insert(row).select();
+    if(resp.error){console.warn('Push error',resp.error);return null}
+    return resp.data[0];
+  }catch(e){console.warn('Push failed',e);return null}
+}
+
+async function deleteFromCloud(id){
+  if(!sb||!id) return;
+  try{await sb.from('cart_items').delete().eq('id',id)}catch(e){console.warn('Delete failed',e)}
+}
+
+async function clearFromCloud(){
+  if(!sb||!teamCode) return;
+  try{await sb.from('cart_items').delete().eq('team_code',teamCode)}catch(e){console.warn('Clear failed',e)}
+}
+
+function startAutoSync(){
+  if(syncTimer) clearInterval(syncTimer);
+  syncTimer=setInterval(function(){
+    if(teamCode) syncFromCloud();
+    if(teamCode) loadTeamProfile();
+  },5000);
+}
+
+// ===== 下单功能 =====
+function placeOrder(){
+  try{
+  if(cartData.length===0){showToast('⚠️ 选购清单为空');return}
+  document.getElementById('addressModal').classList.add('show');
+  var savedAddr=JSON.parse(localStorage.getItem('cg_shipping')||'{}');
+  document.getElementById('shipName').value=savedAddr.name||'';
+  document.getElementById('shipPhone').value=savedAddr.phone||'';
+  document.getElementById('shipAddr').value=savedAddr.address||'';
+  }catch(e){console.error('[placeOrder]',e);showToast('❌ 打开下单失败：'+e.message)}
+}
+
+// 显示下单进度覆盖层
+function showOrderProgress(step,msg){
+  var el=document.getElementById('orderProgressOverlay');
+  if(!el)return;
+  el.style.display='flex';
+  var steps=el.querySelectorAll('.op-step');
+  steps.forEach(function(s,i){
+    if(i<step){s.className='op-step done'}
+    else if(i===step){s.className='op-step active'}
+    else{s.className='op-step pending'}
+  });
+  var msgEl=el.querySelector('.op-msg');
+  if(msgEl) msgEl.textContent=msg||'';
+}
+
+function hideOrderProgress(){
+  var el=document.getElementById('orderProgressOverlay');
+  if(el) el.style.display='none';
+}
+
+// 下单核心：由地址弹窗"确认下单"按钮调用
+// 弹出确认订单弹窗 → 用户点"确认下单" → handleConfirmOk() → doCreateOrder()
+function submitOrder(){
+  try{
+  var shipName=document.getElementById('shipName').value.trim();
+  var shipPhone=document.getElementById('shipPhone').value.trim();
+  var shipAddr=document.getElementById('shipAddr').value.trim();
+
+  if(!shipName){showToast('⚠️ 请填写收货人姓名');return}
+  if(!shipPhone){showToast('⚠️ 请填写联系电话');return}
+  if(!shipAddr){showToast('⚠️ 请填写收货地址');return}
+
+  localStorage.setItem('cg_shipping',JSON.stringify({name:shipName,phone:shipPhone,address:shipAddr}));
+  document.getElementById('addressModal').classList.remove('show');
+
+  var cartCount=cartData.length;
+  if(cartCount===0){showToast('⚠️ 选购清单为空');return}
+
+  // 暂存收货信息，打开下单配置弹窗
+  window._pendingShip={shipName:shipName,shipPhone:shipPhone,shipAddr:shipAddr};
+  renderOrderConfig();
+  document.getElementById('orderConfigModal').classList.add('show');
+
+  }catch(e){
+    console.error('[submitOrder]',e);
+    showToast('❌ 下单异常：'+e.message);
+  }
+}
+
+// 渲染下单配置弹窗（面料+缝纫）
+function renderOrderConfig(){
+  var fel=document.getElementById('configFabricRow');
+  var fhtml='';
+  fabrics.forEach(function(f){
+    var on=f.id===currentFabric?'on':'';
+    fhtml+='<div class="fabric-card '+on+'" onclick="currentFabric=\''+f.id+'\';renderOrderConfig()">'
+      +'<span class="f-icon">'+f.icon+'</span>'
+      +'<div class="f-name">'+f.name.replace(/\n/g,'<br>')+'</div>'
+      +'<div class="f-desc">'+f.desc+'</div>'
+      +'</div>';
+  });
+  fel.innerHTML=fhtml;
+
+  var sel=document.getElementById('configStitchRow');
+  var shtml='';
+  stitchOptions.forEach(function(s){
+    var on=s.id===currentStitch?'on':'';
+    shtml+='<div class="fabric-card '+on+'" style="min-width:85px" onclick="currentStitch=\''+s.id+'\';renderOrderConfig()">'
+      +'<span class="f-icon">'+s.icon+'</span>'
+      +'<div class="f-name">'+s.name+'</div>'
+      +'<div class="f-desc">'+s.desc+'</div>'
+      +'</div>';
+  });
+  sel.innerHTML=shtml;
+}
+
+// 下单配置确认→构建订单→最终确认
+function confirmOrderConfig(){
+  var remark=document.getElementById('configRemark').value.trim();
+  var ship=window._pendingShip;
+  if(!ship){showToast('❌ 会话过期，请重新下单');return}
+  document.getElementById('orderConfigModal').classList.remove('show');
+
+  var cartCount=cartData.length;
+  var snapshotItems=cartData.map(function(it){
+    return {name:it.name,detail:it.detail,size:it.sz,age:it.age,addFat:it.addFat,scheme:it.scheme,custom:it.custom};
+  });
+  var snapshotBenefit=getBenefitLevel(cartCount);
+
+  var fabric=fabrics.find(function(f){return f.id===currentFabric});
+  var fabricName=fabric?fabric.name.replace(/\n/g,''):'';
+  var stitch=stitchOptions.find(function(s){return s.id===currentStitch});
+  var stitchName=stitch?stitch.name:'';
+
+  window._pendingOrder={items:snapshotItems,count:cartCount,benefit:snapshotBenefit,
+    shipName:ship.shipName,shipPhone:ship.shipPhone,shipAddr:ship.shipAddr,
+    fabric:fabricName,stitch:stitchName,remark:remark};
+
+  var snapshotHtml=snapshotItems.map(function(it){
+    return '<span style="background:var(--bg);padding:2px 8px;border-radius:6px;font-size:12px;margin:2px;display:inline-block">'+it.name+'('+it.size+'码'+(it.addFat?'🍔加肥+¥20':'')+')</span>';
+  }).join('');
+
+  var configInfo='';
+  if(fabricName) configInfo+='🧵 面料：'+fabricName+'<br>';
+  if(stitchName) configInfo+='🪡 工艺：'+stitchName+'<br>';
+  if(remark) configInfo+='📝 备注：'+remark+'<br>';
+
+  var confirmMsg='确定下单吗？<br><br>'
+    +'商品：共'+cartCount+'件<br>'
+    +'<div style="margin:6px 0">'+snapshotHtml+'</div>';
+  if(configInfo){
+    confirmMsg+='<div style="margin:6px 0;padding:8px;background:var(--bg);border-radius:8px;font-size:12px;line-height:1.8">'+configInfo+'</div>';
+  }
+  if(snapshotBenefit.minAmount>0){
+    confirmMsg+='<br>🎉 本单权益：'+getBenefitText(snapshotBenefit)+'<br>';
+  }
+  confirmMsg+='<br>收货人：'+ship.shipName+' '+ship.shipPhone+'<br>'
+    +'收货地址：'+ship.shipAddr+'<br><br>'
+    +'下单后选购清单将被清空，<br>请联系完成付款。';
+
+  showConfirm({
+    icon:'📦',
+    title:'确认下单',
+    msg:confirmMsg,
+    okText:'确认下单',
+    mode:'order'
+  });
+}
+
+// 实际创建订单（由handleConfirmOk直接调用）
+async function doCreateOrder(){
+
+  var order=window._pendingOrder;
+  if(!order){showToast('❌ 订单数据丢失，请重试');return}
+  window._pendingOrder=null;
+
+  // 显示进度覆盖层
+  showOrderProgress(0,'正在准备订单数据...');
+
+  // 无云端/无团队码 → 离线下单
+  if(!sb||!teamCode){
+    showOrderProgress(1,'离线模式，保存本地数据...');
+    cartData=[];
+    updateBadge();
+    hideOrderProgress();
+    // 离线模式也显示成功弹窗
+    var offlineHtml='<div style="background:#fff3e0;border-radius:10px;padding:10px 14px;margin-bottom:10px">'
+      +'📦 共 <b style="font-size:18px;color:var(--accent)">'+order.count+'</b> 件（离线模式）<br>'
+      +'<span style="font-size:11px;color:var(--text3)">⚠️ 未连接云端，订单未写入数据库</span>'
+      +'</div>'
+      +'<div style="text-align:left;margin-bottom:10px;font-size:13px">'
+      +order.items.map(function(it){return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>'+it.name+'</span><span style="color:var(--text3)">'+it.size+'码</span></div>';}).join('')
+      +'</div>'
+      +'<div style="text-align:left;font-size:12px;color:var(--text2);line-height:1.8">'
+      +'📦 收货人：'+order.shipName+' '+order.shipPhone+'<br>'
+      +'📍 地址：'+order.shipAddr
+      +'</div>';
+    document.getElementById('orderSuccessDetail').innerHTML=offlineHtml;
+    document.getElementById('orderSuccessModal').classList.add('show');
+    if(mode==='coach') renderCoachView();
+    return;
+  }
+
+  try{
+  // 步骤1: 构建订单数据
+  showOrderProgress(0,'正在构建订单数据...');
+  var orderRow={
+    team_code:teamCode,
+    items:order.items,
+    total_items:order.count,
+    total_amount:0,
+    status:'unpaid'
+  };
+
+  // 面料/工艺/备注
+  try{if(order.fabric) orderRow.fabric=order.fabric}catch(e){}
+  try{if(order.stitch) orderRow.stitch=order.stitch}catch(e){}
+  try{if(order.remark) orderRow.remark=order.remark}catch(e){}
+
+  // 尝试添加可选字段
+  try{orderRow.shipping_name=order.shipName}catch(e){}
+  try{orderRow.shipping_phone=order.shipPhone}catch(e){}
+  try{orderRow.shipping_address=order.shipAddr}catch(e){}
+  try{
+    var now=new Date();
+    var ds=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+    orderRow.order_no='CG'+ds+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+String(now.getSeconds()).padStart(2,'0');
+  }catch(e){}
+
+  // 步骤2: 写入Supabase
+  showOrderProgress(1,'正在写入云端数据库...');
+  var resp=await sb.from('orders').insert(orderRow).select();
+
+  if(resp.error){
+    // 完整插入失败 → 尝试不同方式
+    showOrderProgress(1,'写入失败，尝试精简模式...');
+    console.warn('[doCreateOrder] full insert failed:',resp.error.message);
+
+    // 尝试1: 最小字段（不带shipping/order_no等可选字段）
+    var minRow={team_code:teamCode,items:order.items,total_items:order.count,total_amount:0,status:'unpaid'};
+    var resp2=await sb.from('orders').insert(minRow).select();
+    if(!resp2.error&&resp2.data&&resp2.data.length>0){
+      resp=resp2;
+      console.log('[doCreateOrder] minimal insert OK');
+    }else if(resp2.error){
+      console.warn('[doCreateOrder] minimal also failed:',resp2.error.message);
+      // 尝试2: items用JSON.stringify
+      var strRow={team_code:teamCode,items:JSON.stringify(order.items),total_items:order.count,total_amount:0,status:'unpaid'};
+      var resp3=await sb.from('orders').insert(strRow).select();
+      if(!resp3.error&&resp3.data&&resp3.data.length>0){
+        resp=resp3;
+        console.log('[doCreateOrder] stringified items insert OK');
+      }else if(resp3.error){
+        // 尝试3: 完全不带items
+        var noItemsRow={team_code:teamCode,total_items:order.count,total_amount:0,status:'unpaid'};
+        var resp4=await sb.from('orders').insert(noItemsRow).select();
+        if(!resp4.error&&resp4.data&&resp4.data.length>0){
+          resp=resp4;
+          console.log('[doCreateOrder] no-items insert OK');
+        }else{
+          hideOrderProgress();
+          showToast('❌ 下单失败：'+resp4.error.message);
+          // 显示详细错误到诊断面板
+          var errHtml='<div style="text-align:left;font-size:12px;line-height:1.8;background:#fff5f5;padding:12px;border-radius:8px">'
+            +'<div style="font-weight:700;color:#c00;margin-bottom:8px">❌ 下单失败详情</div>'
+            +'<div>完整插入: '+resp.error.message+'</div>'
+            +'<div>精简插入: '+resp2.error.message+'</div>'
+            +'<div>Stringify: '+(resp3.error?resp3.error.message:'未知错误')+'</div>'
+            +'<div>无Items: '+(resp4.error?resp4.error.message:'未知错误')+'</div>'
+            +'<div style="margin-top:8px;color:var(--text3)">请截图发给开发者排查</div>'
+            +'</div>';
+          document.getElementById('orderSuccessDetail').innerHTML=errHtml;
+          document.getElementById('orderSuccessModal').classList.add('show');
+          return;
+        }
+      }
+    }
+  }
+
+  if(!resp.data||resp.data.length===0){
+    hideOrderProgress();
+    showToast('❌ 下单失败：数据未写入');
+    return;
+  }
+
+  var orderId=resp.data[0].id;
+  var orderNo=resp.data[0].order_no||('ORD-'+orderId.substring(0,8));
+
+  // 步骤3: 清空购物车
+  showOrderProgress(2,'正在清空选购清单...');
+  try{await clearFromCloud()}catch(e){console.warn('[doCreateOrder] clearCloud:',e)}
+  cartData=[];
+  updateBadge();
+
+  // 步骤4: 显示成功弹窗
+  showOrderProgress(3,'下单成功！');
+
+  var coachName=teamProfile?teamProfile.coach_name:'晨哥';
+  var coachPhone2=teamProfile&&teamProfile.phone?teamProfile.phone:'';
+  var detailHtml=order.items.map(function(it){return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>'+it.name+'</span><span style="color:var(--text3)">'+it.size+'码</span></div>';}).join('');
+
+  document.getElementById('orderSuccessDetail').innerHTML=
+    '<div style="background:var(--accent-bg);border-radius:10px;padding:10px 14px;margin-bottom:10px">'
+    +'📋 订单编号：<b style="font-size:16px">'+orderNo+'</b><br>'
+    +'📦 共 <b style="font-size:18px;color:var(--accent)">'+order.count+'</b> 件'
+    +(order.benefit.minAmount>0?' · 🎉 '+getBenefitText(order.benefit):'')
+    +'</div>'
+    +'<div style="text-align:left;margin-bottom:10px;font-size:13px">'+detailHtml+'</div>'
+    +'<div style="text-align:left;font-size:12px;color:var(--text2);line-height:1.8">'
+    +'📦 收货人：'+order.shipName+' '+order.shipPhone+'<br>'
+    +'📍 地址：'+order.shipAddr
+    +'</div>'
+    +'<div style="margin-top:10px;padding:10px;background:var(--warn-bg);border-radius:8px;font-size:12px;color:var(--warn);text-align:left;line-height:1.6">'
+    +(coachPhone2?'📱 联系产品负责人：'+coachName+' '+coachPhone2:'👤 联系产品负责人：'+coachName)+'<br>'
+    +'💡 请通过微信或者支付宝转账支付后，待确认完毕订单自动生效'
+    +'</div>';
+
+  // 延迟一下让进度条显示"成功"再切到弹窗
+  setTimeout(function(){
+    hideOrderProgress();
+    document.getElementById('orderSuccessModal').classList.add('show');
+  },500);
+
+  if(mode==='coach') renderCoachView();
+
+  }catch(e){
+    console.error('[doCreateOrder] Exception:',e);
+    hideOrderProgress();
+    showToast('❌ 创建订单异常：'+e.message);
+    // 把错误详情也显示在弹窗里，确保用户可见
+    try{
+      document.getElementById('orderSuccessDetail').innerHTML=
+        '<div style="text-align:left;font-size:12px;line-height:1.8;background:#fff5f5;padding:12px;border-radius:8px">'
+        +'<div style="font-weight:700;color:#c00;margin-bottom:8px">❌ 创建订单异常</div>'
+        +'<div>'+e.message+'</div>'
+        +'<div style="margin-top:8px;color:var(--text3)">请截图发给开发者排查</div>'
+        +'</div>';
+      document.getElementById('orderSuccessModal').classList.add('show');
+    }catch(e2){}
+  }
+}
+
+function closeOrderSuccessModal(){
+  document.getElementById('orderSuccessModal').classList.remove('show');
+}
+
+// ===== 诊断：测试Supabase订单表写入 =====
+async function testOrderInsert(){
+  var results=[];
+  function log(msg){results.push(msg);console.log('[诊断] '+msg)}
+
+  log('1️⃣ Supabase: '+(sb?'已连接':'❌未连接'));
+  log('2️⃣ 团队码: '+(teamCode||'❌未设置'));
+  log('3️⃣ 购物车: '+cartData.length+'件');
+  log('4️⃣ window._pendingOrder: '+(window._pendingOrder?'有数据':'❌无数据'));
+
+  if(!sb){showToast('❌ Supabase未连接');showDiagResult(results);return}
+  if(!teamCode){showToast('❌ 未加入团队码');showDiagResult(results);return}
+
+  log('5️⃣ 测试读取orders表...');
+  try{
+    var r1=await sb.from('orders').select('id').limit(1);
+    if(r1.error){log('❌ 读取失败: '+r1.error.message)}
+    else{log('✅ 读取成功, 返回'+r1.data.length+'条')}
+  }catch(e){log('❌ 读取异常: '+e.message)}
+
+  log('6️⃣ 测试最小插入...');
+  try{
+    var testRow={team_code:teamCode,items:[{name:'测试',size:'130',detail:'诊断'}],total_items:1,total_amount:0,status:'unpaid'};
+    var r2=await sb.from('orders').insert(testRow).select();
+    if(r2.error){
+      log('❌ 插入失败: '+r2.error.message);
+      // 不带items重试
+      delete testRow.items;
+      var r3=await sb.from('orders').insert(testRow).select();
+      if(r3.error){log('❌ 不带items也失败: '+r3.error.message)}
+      else{log('⚠️ 不带items成功！items字段可能类型不对');await sb.from('orders').delete().eq('id',r3.data[0].id)}
+    }else{
+      log('✅ 插入成功, id='+r2.data[0].id);
+      await sb.from('orders').delete().eq('id',r2.data[0].id);
+      log('✅ 已清理测试数据');
+    }
+  }catch(e){log('❌ 插入异常: '+e.message)}
+
+  log('7️⃣ 测试完整插入（含shipping等）...');
+  try{
+    var fullRow={team_code:teamCode,items:[{name:'测试',size:'130',detail:'诊断'}],total_items:1,total_amount:0,status:'unpaid',
+      shipping_name:'测试',shipping_phone:'13800000000',shipping_address:'测试地址',
+      order_no:'TEST'+Date.now()};
+    var r4=await sb.from('orders').insert(fullRow).select();
+    if(r4.error){log('❌ 完整插入失败: '+r4.error.message)}
+    else{log('✅ 完整插入成功');await sb.from('orders').delete().eq('id',r4.data[0].id)}
+  }catch(e){log('❌ 完整插入异常: '+e.message)}
+
+  log('8️⃣ showConfirm测试...');
+  try{
+    showConfirm({icon:'🧪',title:'确认测试',msg:'这是诊断测试，点确定测试回调',okText:'确定',onOk:function(){log('✅ showConfirm回调正常');showDiagResult(results)}});
+    return; // 等待用户点确定后再显示结果
+  }catch(e){log('❌ showConfirm异常: '+e.message)}
+
+  showDiagResult(results);
+}
+
+function showDiagResult(results){
+  var html='<div style="text-align:left;font-size:12px;line-height:1.8;font-family:monospace;background:var(--bg);padding:12px;border-radius:8px;max-height:50vh;overflow-y:auto">'
+    +results.map(function(r){
+      var color=r.indexOf('❌')>=0?'#c00':r.indexOf('✅')>=0?'#080':r.indexOf('⚠️')>=0?'#a50':'var(--text2)';
+      return '<div style="color:'+color+'">'+r+'</div>';
+    }).join('')
+    +'</div>';
+  document.getElementById('orderSuccessDetail').innerHTML=html;
+  document.getElementById('orderSuccessModal').classList.add('show');
+}
+
+// ===== 方案管理 =====
+function renderSchemeRow(){
+  var el=document.getElementById('schemeRow');
+  if(!el) return;
+  var html='';
+  schemes.forEach(function(s){
+    var on=s.id===currentScheme?'on':'';
+    var imgHtml=s.imgData
+      ?'<img class="s-img" src="'+s.imgData+'" alt="'+s.name+'">'
+      :'<div class="s-img-placeholder">🖼️</div>';
+    html+='<div class="scheme-card '+on+'" onclick="selectScheme(\''+s.id+'\')">'
+      +imgHtml
+      +'<div class="s-name">'+s.name+'</div>'
+      +'<div class="s-label">'+(s.imgData?'效果图已上传':'点击选择')+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+function selectScheme(id){
+  currentScheme=id;
+  renderSchemeRow();
+}
+
+function openSchemeModal(){
+  renderSchemeMgr();
+  document.getElementById('schemeModal').classList.add('show');
+}
+function closeSchemeModal(){
+  document.getElementById('schemeModal').classList.remove('show');
+  renderSchemeRow();
+}
+
+function renderSchemeMgr(){
+  var el=document.getElementById('schemeMgrList');
+  var html='';
+  schemes.forEach(function(s,i){
+    var imgHtml=s.imgData
+      ?'<img class="sm-img" src="'+s.imgData+'" alt="'+s.name+'">'
+      :'<div class="sm-img-placeholder">🖼️</div>';
+    html+='<div class="scheme-mgr-item">'
+      +'<div onclick="triggerUpload('+i+')" style="cursor:pointer">'+imgHtml+'</div>'
+      +'<div class="sm-info">'
+      +'<input type="text" value="'+s.name+'" placeholder="方案名称" onchange="updateSchemeName('+i+',this.value)" style="margin-bottom:6px">'
+      +'<div><span class="sm-upload" onclick="triggerUpload('+i+')">📷 上传效果图</span><span class="sm-remove" onclick="removeSchemeImg('+i+')">'+(s.imgData?'移除图片':'')+'</span></div>'
+      +'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+function updateSchemeName(idx,val){
+  schemes[idx].name=val.trim()||schemes[idx].name;
+  saveSchemes();
+}
+
+function triggerUpload(idx){
+  window._uploadIdx=idx;
+  document.getElementById('fileInput').click();
+}
+
+function handleFileUpload(event){
+  var file=event.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){showToast('⚠️ 请选择图片文件');return}
+  if(file.size>5*1024*1024){showToast('⚠️ 图片不能超过5MB');return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var idx=window._uploadIdx;
+    schemes[idx].imgData=e.target.result;
+    saveSchemes();
+    renderSchemeMgr();
+    showToast('✅ '+schemes[idx].name+' 效果图已上传');
+  };
+  reader.readAsDataURL(file);
+  event.target.value='';
+}
+
+function removeSchemeImg(idx){
+  showConfirm({
+    icon:'🗑️',
+    title:'移除效果图',
+    msg:'确定移除该方案的效果图吗？',
+    okText:'移除',
+    danger:true,
+    onOk:function(){
+      schemes[idx].imgData=null;
+      saveSchemes();
+      renderSchemeMgr();
+    }
+  });
+}
+
+// ===== Toast =====
+function showToast(msg){
+  var toast=document.createElement('div');
+  toast.className='toast';
+  toast.textContent=msg;
+  document.body.appendChild(toast);
+  setTimeout(function(){toast.remove()},2000);
+}
+
+// ===== 自定义确认弹窗（替代confirm）=====
+var _confirmCb=null;
+var _confirmMode=''; // 'order' 或其他
+function showConfirm(opts){
+  _confirmMode=opts.mode||'';
+  _confirmCb=opts.onOk||null;
+  document.getElementById('confirmIcon').textContent=opts.icon||'⚠️';
+  document.getElementById('confirmTitle').textContent=opts.title||'确认操作';
+  document.getElementById('confirmMsg').innerHTML=opts.msg||'';
+  var okBtn=document.getElementById('confirmOk');
+  okBtn.textContent=opts.okText||'确定';
+  okBtn.className='cb-btn cb-ok'+(opts.danger?' danger':'');
+  okBtn.disabled=false;
+  document.getElementById('confirmDialog').classList.add('show');
+}
+// 全局函数：由确认弹窗按钮的onclick直接调用（最可靠方式）
+function handleConfirmOk(){
+  var okBtn=document.getElementById('confirmOk');
+  okBtn.disabled=true;
+  okBtn.textContent='处理中...';
+  // 下单模式：直接调用doCreateOrder
+  if(_confirmMode==='order'){
+    closeConfirm();
+    showToast('⏳ 正在下单...');
+    doCreateOrder();
+    return;
+  }
+  // 通用回调模式
+  var cb=_confirmCb;
+  if(!cb){closeConfirm();return}
+  closeConfirm();
+  try{
+    var result=cb();
+    if(result&&typeof result.then==='function'){
+      result.catch(function(e){
+        console.error('[confirmCb]',e);
+        showToast('❌ 操作失败：'+e.message);
+      });
+    }
+  }catch(e){
+    console.error('[confirmCb]',e);
+    showToast('❌ 操作失败：'+e.message);
+  }
+}
+function closeConfirm(){
+  document.getElementById('confirmDialog').classList.remove('show');
+  _confirmCb=null;
+  _confirmMode='';
+}
+
+// ===== 定制内容联动 =====
+function toggleCustom(inputId,checked){
+  document.getElementById(inputId).disabled=!checked;
+  if(!checked) document.getElementById(inputId).value='';
+}
+
+// ===== 工具函数 =====
+function fin(db,sz,col){
+  var v=db.data[sz][col];
+  if(db.halfIdx.has(col)) v*=2;
+  return Math.round(v*SHRINK*10)/10;
+}
+function updateBadge(){
+  var badge=document.getElementById('coachBadge');
+  if(cartData.length>0){badge.textContent=cartData.length;badge.classList.add('show')}
+  else{badge.classList.remove('show')}
+}
+
+// ===== 标准体重参考提示 =====
+function updateWtRefHint(){
+  var h=parseInt(document.getElementById('iH').value)||0;
+  var hintEl=document.getElementById('wtRefHint');
+  var db=D[age];
+  var sizes=db.sizes;
+  if(!h||h<sizes[0]||h>sizes[sizes.length-1]){
+    // 显示全部标准体重参考表
+    var parts=[];
+    sizes.forEach(function(s){
+      var ref=db.wtRef[s];
+      if(ref) parts.push(s+'码→'+ref.f+'kg');
+    });
+    hintEl.innerHTML='📋 标准体重参考：'+parts.join(' · ')+'（超标>8kg每8kg+1码；加肥版+¥20）';
+    return;
+  }
+  // 找到身高对应的尺码
+  var best=0,minD=999;
+  sizes.forEach(function(s,i){var d=Math.abs(s-h);if(d<minD){minD=d;best=i}});
+  var sz=sizes[best];
+  var ref=db.wtRef[sz];
+  if(!ref){hintEl.innerHTML='';return}
+  var w=parseFloat(document.getElementById('iW').value)||0;
+  if(w>0){
+    var diff=w-ref.f;
+    if(diff>0){
+      var addSz=0;var fatHint='';
+      if(diff>8){
+        if(addFat){
+          // 加肥路线：8~16kg→加肥不加码；≥16kg→每8kg +1码+加肥
+          if(diff>=16){
+            addSz=Math.floor((diff-8)/8);
+            fatHint=' · 🍔加肥路线：+'+addSz+'码+加肥(+¥20)';
+          }else{
+            fatHint=' · 🍔加肥路线：同码加肥(+¥20)';
+          }
+        }else{
+          // 标准路线：每超8kg +1码（8~16kg→+1码，16~24kg→+2码…）
+          addSz=Math.floor(diff/8);
+          fatHint=' · 标准路线：+'+addSz+'码';
+        }
+      }
+      hintEl.innerHTML='⚖️ '+sz+'码标准体重<b>'+ref.f+'kg</b>，当前<b style="color:var(--warn)">'+w+'kg</b>（超'+diff.toFixed(1)+'kg'+(addSz>0?'，+'+addSz+'码':'，不加码')+'）'+fatHint;
+    }else{
+      hintEl.innerHTML='⚖️ '+sz+'码标准体重<b>'+ref.f+'kg</b>，当前<b style="color:var(--accent)">'+w+'kg</b>（正常范围✅）';
+    }
+  }else{
+    hintEl.innerHTML='⚖️ '+sz+'码标准体重参考：<b>'+ref.f+'kg</b>（超标>8kg每8kg+1码；加肥版+¥20）';
+  }
+}
+
+// ===== 事件绑定 =====
+document.querySelectorAll('#ageSeg .seg-item').forEach(function(el){
+  el.onclick=function(){
+    age=el.dataset.v;
+    document.querySelectorAll('#ageSeg .seg-item').forEach(function(e){e.classList.toggle('on',e===el)});
+    document.getElementById('res').classList.remove('show');
+    var hInput=document.getElementById('iH');
+    var hHint=document.getElementById('hHint');
+    if(age==='child'){
+      hInput.min=110;hInput.max=155;hInput.placeholder='110~155';
+      hHint.textContent='（儿童：110~155）';
+    }else{
+      hInput.min=160;hInput.max=190;hInput.placeholder='160~190';
+      hHint.textContent='（成人：160~190）';
+    }
+    hInput.value='';
+    updateWtRefHint();
+    if(mode==='coach') renderCoachView();
+  };
+});
+document.querySelectorAll('.mode-btn').forEach(function(el){
+  el.onclick=function(){
+    mode=el.dataset.v;
+    document.querySelectorAll('.mode-btn').forEach(function(e){e.classList.toggle('on',e===el)});
+    document.getElementById('cardEasy').style.display=mode==='easy'?'block':'none';
+    document.getElementById('cardPro').style.display=mode==='pro'?'block':'none';
+    document.getElementById('cardCoach').style.display=mode==='coach'?'block':'none';
+    document.getElementById('res').classList.remove('show');
+    if(mode==='coach') renderCoachView();
+  };
+});
+document.querySelectorAll('.fit-card').forEach(function(el){
+  el.onclick=function(){
+    fit=el.dataset.v;
+    document.querySelectorAll('.fit-card').forEach(function(e){e.classList.toggle('on',e.dataset.v===fit)});
+  };
+});
+function selectFat(el,val){
+  addFat=val;
+  document.querySelectorAll('#fatRowEasy .fat-option-card').forEach(function(e){e.classList.toggle('on',e===el)});
+  // 如果已有结果，重新计算
+  if(lastResult&&mode==='easy'&&document.getElementById('res').classList.contains('show')){
+    var db=D[age];
+    var h=parseFloat(document.getElementById('iH').value);
+    var w=parseFloat(document.getElementById('iW').value)||0;
+    if(h){
+      var sz=calcByH(h,w,db);
+      var inputs={name:lastResult.inputs.name,height:h,weight:w,mode:'easy'};
+      lastResult={sz:sz,inputs:inputs,age:age,addFat:addFat};
+      showResult(sz,inputs,db);
+    }
+  }
+}
+// 专业模式加肥选择
+function selectFatPro(el,val){
+  addFat=val;
+  document.querySelectorAll('#fatRowPro .fat-option-card').forEach(function(e){e.classList.toggle('on',e===el)});
+}
+// 身高/体重输入实时更新标准体重提示
+document.getElementById('iH').addEventListener('input',updateWtRefHint);
+document.getElementById('iW').addEventListener('input',updateWtRefHint);
+// 初始化提示
+updateWtRefHint();
+
+// ===== 推荐逻辑 =====
+function calc(){
+  var db=D[age];
+  var sz,inputs={mode:mode};
+
+  if(mode==='easy'){
+    var name=document.getElementById('iName1').value.trim();
+    var h=parseFloat(document.getElementById('iH').value);
+    var w=parseFloat(document.getElementById('iW').value)||0;
+    if(!name){showToast('⚠️ 请输入队员姓名（必填项）');document.getElementById('iName1').focus();return}
+    if(!h){showToast('⚠️ 请输入身高');document.getElementById('iH').focus();return}
+    if(age==='child'&&(h<110||h>155)){showToast('⚠️ 儿童款身高范围为110~155cm，您输入的'+h+'cm不在范围内');document.getElementById('iH').focus();return}
+    if(age==='adult'&&(h<160||h>190)){showToast('⚠️ 成人款身高范围为160~190cm，您输入的'+h+'cm不在范围内');document.getElementById('iH').focus();return}
+    inputs.name=name;inputs.height=h;inputs.weight=w;
+    // addFat由用户手动勾选，不再自动判断
+    sz=calcByH(h,w,db);
+  }else{
+    var name=document.getElementById('iName2').value.trim();
+    var c=parseFloat(document.getElementById('iC').value);
+    var hp=parseFloat(document.getElementById('iHp').value);
+    var t=parseFloat(document.getElementById('iT').value);
+    if(!name){showToast('⚠️ 请输入队员姓名（必填项）');document.getElementById('iName2').focus();return}
+    if(!c||!hp||!t){showToast('⚠️ 请填写完整的胸围、臀围、大腿围');return}
+    inputs.name=name;inputs.chest=c;inputs.hip=hp;inputs.thigh=t;inputs.fit=fit;
+    sz=calcByM(c,hp,t,fit,db);
+  }
+
+  lastResult={sz:sz,inputs:inputs,age:age,addFat:addFat};
+  showResult(sz,inputs,db);
+}
+
+function calcByH(h,w,db){
+  var sizes=db.sizes;
+  // 找最接近身高的尺码作为基准
+  var best=0,minD=999;
+  sizes.forEach(function(s,i){var d=Math.abs(s-h);if(d<minD){minD=d;best=i}});
+  var idx=best;
+  var autoFat=false;
+
+  // 体重加码逻辑（2026-06-17 v4 每8kg一档）：
+  // 标准路线（不加价）：超标≤8kg不加码，每超8kg +1码
+  // 加肥路线（+¥20）：  超标8~16kg加肥不加码，≥16kg每超8kg +1码+加肥
+  if(w>0){
+    var ref=db.wtRef[sizes[idx]];
+    if(ref&&w>ref.f){
+      var overWeight=w-ref.f;
+      if(overWeight>8){
+        if(addFat){
+          // 加肥路线：8~16kg→加肥不加码；≥16kg→每8kg +1码+加肥
+          if(overWeight>=16){
+            var fatSteps=Math.floor((overWeight-8)/8);
+            idx=Math.min(idx+fatSteps,sizes.length-1);
+          }
+          autoFat=true;
+        }else{
+          // 标准路线：每超8kg +1码
+          var steps=Math.floor(overWeight/8);
+          idx=Math.min(idx+steps,sizes.length-1);
+          autoFat=false;
+        }
+      }
+    }
+    // 体重过轻，考虑减一码（仅在身高接近小一码时）
+    if(ref&&w<ref.m*0.7&&idx>0&&sizes[idx]-h>=5)idx--;
+  }
+  // 存储加肥标记供后续使用
+  window._calcAutoFat=autoFat;
+
+  return sizes[idx];
+}
+
+function calcByM(chest,hip,thigh,fitType,db){
+  var sizes=db.sizes;
+  var ideal=fitType==='tight'?-4:3;
+  var rangeMin=fitType==='tight'?-8:-2;
+  var rangeMax=fitType==='tight'?2:8;
+  var bestIdx=-1,bestScore=-Infinity;
+  sizes.forEach(function(s,i){
+    var cF=fin(db,s,db.keyMap.chest);
+    var hF=fin(db,s,db.keyMap.hip);
+    var tF=fin(db,s,db.keyMap.thigh);
+    var cS=cF-chest,hS=hF-hip,tS=tF-thigh;
+    var cOk=cS>=rangeMin&&cS<=rangeMax;
+    var hOk=hS>=rangeMin&&hS<=rangeMax;
+    var tOk=tS>=rangeMin&&tS<=rangeMax;
+    if(!cOk||!hOk||!tOk)return;
+    var score=Math.min(-Math.abs(cS-ideal),-Math.abs(hS-ideal),-Math.abs(tS-ideal));
+    if(score>bestScore){bestScore=score;bestIdx=i}
+  });
+  if(bestIdx===-1){
+    var minOverflow=Infinity;
+    sizes.forEach(function(s,i){
+      var cF=fin(db,s,db.keyMap.chest);
+      var hF=fin(db,s,db.keyMap.hip);
+      var tF=fin(db,s,db.keyMap.thigh);
+      var overflow=Math.max(0,chest-cF-rangeMax)+Math.max(0,hip-hF-rangeMax)+Math.max(0,thigh-tF-rangeMax);
+      var underflow=Math.max(0,cF-chest+rangeMin)+Math.max(0,hF-hip+rangeMin)+Math.max(0,tF-thigh+rangeMin);
+      var total=overflow+underflow;
+      if(total<minOverflow){minOverflow=total;bestIdx=i}
+    });
+  }
+  // 加肥标记（专业模式下手动勾选生效，不加码）
+  window._calcAutoFat=addFat;
+  return sizes[bestIdx];
+}
+
+// ===== 展示结果 =====
+function showResult(sz,inputs,db){
+  document.getElementById('rSize').textContent=sz;
+  document.getElementById('rLabel').textContent=age==='child'?'推荐儿童尺码':'推荐成人尺码';
+  var tag=document.getElementById('rTag');
+  var isFat=addFat||window._calcAutoFat;
+  if(isFat){
+    tag.textContent='🍔 加肥版 · +¥20';
+    tag.className='tag loose';
+  }else{
+    tag.textContent=mode==='easy'?'标准款 · 身高体重推荐':'标准款 · 竞技贴身';
+    tag.className='tag tight';
+  }
+  // 加肥版：胸围/臀围/大腿围取下一码数据
+  var fatSz=sz;
+  if(isFat){
+    var szIdx=db.sizes.indexOf(sz);
+    if(szIdx>=0&&szIdx<db.sizes.length-1) fatSz=db.sizes[szIdx+1];
+  }
+  var thead=document.getElementById('rHead');
+  var tbody=document.getElementById('rBody');
+  tbody.innerHTML='';
+  if(mode==='easy'){
+    // 简易模式：成品尺寸 + 松量（对比标准净体参考值）
+    thead.innerHTML='<tr><th>部位</th><th>成品尺寸</th><th>松量</th></tr>';
+    var allParts=[
+      {name:'胸围',idx:db.keyMap.chest,refKey:'chest'},
+      {name:'臀围',idx:db.keyMap.hip,refKey:'hip'},
+      {name:'大腿围',idx:db.keyMap.thigh,refKey:'thigh'},
+    ];
+    var ref=db.bodyRef[sz];
+    allParts.forEach(function(p){
+      var fv=fin(db,fatSz,p.idx);
+      var refVal=ref?p.refKey?ref[p.refKey]:0:0;
+      var sl=Math.round((fv-refVal)*10)/10;
+      var cls=sl>=2?'ok':sl>=-2?'ok':sl>=-5?'warn':'bad';
+      var sign=sl>0?'+':'';
+      tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td><td><span class="'+cls+'">'+sign+sl+'cm</span></td></tr>';
+    });
+  }else{
+    // 专业模式：带三围对比和松量，不显示衣长等额外参数
+    thead.innerHTML='<tr><th>部位</th><th>孩子尺寸</th><th>成品尺寸</th><th>松量</th></tr>';
+    var keyParts=[
+      {name:'胸围',idx:db.keyMap.chest,uVal:inputs.chest},
+      {name:'臀围',idx:db.keyMap.hip,uVal:inputs.hip},
+      {name:'大腿围',idx:db.keyMap.thigh,uVal:inputs.thigh},
+    ];
+    keyParts.forEach(function(p){
+      var fv=fin(db,fatSz,p.idx);
+      var slackHtml='—';
+      if(p.uVal){
+        var sl=Math.round((fv-p.uVal)*10)/10;
+        var cls=sl>=2?'ok':sl>=-2?'ok':sl>=-5?'warn':'bad';
+        var sign=sl>0?'+':'';
+        slackHtml='<span class="'+cls+'">'+sign+sl+'cm</span>';
+      }
+      tbody.innerHTML+='<tr><td>'+p.name+'</td><td>'+(p.uVal?p.uVal+'cm':'未量')+'</td><td class="v">'+fv+'cm</td><td>'+slackHtml+'</td></tr>';
+    });
+  }
+  var tip=document.getElementById('rTip');
+  if(mode==='easy'){
+    var wNote='';
+    if(inputs.weight>0&&db.wtRef[sz]){
+      var refW=db.wtRef[sz].f;
+      var ow=inputs.weight-refW;
+      if(ow>0&&ow<=8) wNote=' · 超标≤8kg，不加码';
+      else if(ow>8){
+        if(isFat){
+          if(ow>=16) wNote=' · 🍔加肥路线：+'+Math.floor((ow-8)/8)+'码+加肥(+¥20)';
+          else wNote=' · 🍔加肥路线：同码加肥(+¥20)';
+        }else{
+          wNote=' · 标准路线：+'+Math.floor(ow/8)+'码';
+        }
+      }
+      else wNote=' · 体重正常范围';
+    }
+    tip.innerHTML='📊 身高'+inputs.height+'cm → 匹配<b>'+sz+'码</b>'+(isFat?'（🍔 加肥版 +¥20 · 胸臀腿取下一码数据）':'（标准款）')+wNote+'<br>📐 成品尺寸已计入<b>3%高温印花缩率</b><br>💡 标准路线：超标≤8kg不加，每8kg +1码<br>💡 加肥路线(+¥20)：8~16kg加肥不加码，≥16kg每8kg +1码+加肥';
+  }else{
+    tip.innerHTML='📊 根据三围数据匹配<b>'+sz+'码</b>'+(isFat?'（🍔 加肥版 +¥20 · 胸臀腿取下一码数据）':'（标准款：竞技贴身）')+'<br>📐 成品尺寸已计入<b>3%高温印花缩率</b><br>💡 松量为负表示面料需拉伸穿着，属弹力速滑服正常现象';
+  }
+
+  if(!currentScheme||!schemes.find(function(s){return s.id===currentScheme})){
+    currentScheme=schemes[0]?schemes[0].id:null;
+  }
+
+  ['cName','cNumber','cLogo','cRemark'].forEach(function(id){document.getElementById(id).checked=false});
+  ['cNameInput','cNumberInput','cLogoInput','cRemarkInput'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).disabled=true});
+
+  var btn=document.getElementById('btnAddCart');
+  btn.className='add-cart';
+  btn.textContent='✅ 确认尺码，加入选购清单';
+  btn.disabled=false;
+
+  document.getElementById('res').classList.add('show');
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ===== 加入选购清单（含查重 + 云端同步）=====
+async function addToCart(){
+  if(!lastResult) return;
+
+  var name=lastResult.inputs.name;
+  if(!name){showToast('⚠️ 队员姓名不能为空');return}
+
+  // 查重
+  var duplicate=cartData.find(function(item){return item.name===name});
+  if(duplicate){
+    showToast('⚠️ 姓名「'+name+'」已存在，如需修改请先删除再重新添加');
+    return;
+  }
+
+  // 收集定制内容
+  var custom=[];
+  if(document.getElementById('cName').checked&&document.getElementById('cNameInput').value) custom.push('姓名:'+document.getElementById('cNameInput').value);
+  if(document.getElementById('cNumber').checked&&document.getElementById('cNumberInput').value) custom.push('号码:'+document.getElementById('cNumberInput').value);
+  if(document.getElementById('cLogo').checked&&document.getElementById('cLogoInput').value) custom.push('Logo:'+document.getElementById('cLogoInput').value);
+  if(document.getElementById('cRemark').checked&&document.getElementById('cRemarkInput').value) custom.push('备注:'+document.getElementById('cRemarkInput').value);
+
+  var scheme=schemes.find(function(s){return s.id===currentScheme});
+  var schemeName=scheme?scheme.name:'';
+
+  var detail='';
+  if(lastResult.inputs.height){
+    detail=lastResult.inputs.height+'cm';
+    if(lastResult.inputs.weight>0) detail+=' / '+lastResult.inputs.weight+'kg';
+  }else{
+    detail='胸'+lastResult.inputs.chest+' / 臀'+lastResult.inputs.hip+' / 腿'+lastResult.inputs.thigh;
+  }
+
+  var item={
+    name:name,
+    detail:detail,
+    sz:lastResult.sz,
+    age:lastResult.age,
+    addFat:lastResult.addFat||false,
+    scheme:schemeName,
+    custom:custom
+  };
+
+  var btn=document.getElementById('btnAddCart');
+
+  // 推送到云端
+  if(sb&&teamCode){
+    btn.textContent='⏳ 正在同步...';
+    var cloudItem=await pushToCloud(item);
+    if(cloudItem){
+      item.id=cloudItem.id;
+      cartData.push(item);
+      btn.className='add-cart added';
+      btn.textContent='✅ 已加入！继续输入下一位';
+      btn.disabled=true;
+    }else{
+      cartData.push(item);
+      btn.className='add-cart added';
+      btn.textContent='✅ 已加入（离线模式）';
+      btn.disabled=true;
+      showToast('⚠️ 云端同步失败，数据仅保存在本地');
+    }
+  }else{
+    cartData.push(item);
+    btn.className='add-cart added';
+    btn.textContent='✅ 已加入！继续输入下一位';
+    btn.disabled=true;
+  }
+
+  updateBadge();
+
+  setTimeout(function(){
+    if(mode==='easy'){
+      document.getElementById('iName1').value='';
+      document.getElementById('iH').value='';
+      document.getElementById('iW').value='';
+      document.getElementById('iName1').focus();
+    }else{
+      document.getElementById('iName2').value='';
+      document.getElementById('iC').value='';
+      document.getElementById('iHp').value='';
+      document.getElementById('iT').value='';
+      document.getElementById('iName2').focus();
+    }
+  },300);
+}
+
+// ===== 选购清单视图 =====
+function renderCoachView(){
+  var el=document.getElementById('coachContent');
+
+  if(cartData.length===0){
+    el.innerHTML='<div class="coach-empty">'
+      +'<div class="ce-icon">📋</div>'
+      +'<div class="ce-text">选购清单为空</div>'
+      +'<div class="ce-hint">请在"量身高体重"或"量三围数据"中推荐尺码后<br>点击"确认尺码，加入选购清单"<br><br>💡 分享链接给家长，家长也可以自助添加</div>'
+      +'</div>';
+    return;
+  }
+
+  // 折扣信息
+  var discountInfo=getDiscountLevel(teamProfile?teamProfile.total_orders:0);
+
+  // 当前订单件数 & 权益
+  var cartCount=cartData.length;
+  var cartBenefit=getBenefitLevel(cartCount);
+
+  // 名单列表
+  var html='<div class="coach-list">';
+  cartData.forEach(function(item,i){
+    var schemeStr=item.scheme?' · '+item.scheme:'';
+    var customStr=item.custom&&item.custom.length>0?'<div style="font-size:10px;color:var(--purple);margin-top:1px">'+item.custom.join(' | ')+'</div>':'';
+    html+='<div class="coach-item">'
+      +'<div class="ci-info">'
+      +'<div class="ci-name">'+item.name+'</div>'
+      +'<div class="ci-detail">'+item.detail+schemeStr+customStr+'</div>'
+      +'</div>'
+      +'<div class="ci-size">'+item.sz+(item.addFat?'🍔+20':'')+'</div>'
+      +'<button class="ci-del" onclick="removeFromCart('+i+')">✕</button>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  // 汇总统计
+  var sizes=D[age].sizes;
+  var countMap={};
+  sizes.forEach(function(s){countMap[s]=0});
+  cartData.forEach(function(item){if(item.age===age)countMap[item.sz]=(countMap[item.sz]||0)+1});
+
+  html+='<div class="coach-summary">'
+    +'<h4>📊 尺码汇总统计</h4>'
+    +'<div class="summary-grid">';
+  sizes.forEach(function(s){
+    var c=countMap[s]||0;
+    var cls=c===0?'si-zero':'';
+    html+='<div class="summary-item '+cls+'">'
+      +'<div class="si-size">'+s+'</div>'
+      +'<div class="si-count">'+c+'件</div>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="coach-count">共 '+cartData.length+' 人'
+    +' <span class="sync-indicator"><span class="sync-dot '+(sb&&teamCode?'':'offline')+'"></span> '+(sb&&teamCode?'已同步':'未同步')+'</span></div>';
+
+  // 件数 & 权益展示
+  html+='<div style="background:var(--card);border-radius:12px;padding:14px;margin-top:12px;border:1px solid var(--border)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--text2)">商品件数</span>'
+    +'<span style="font-size:14px;font-weight:600">'+cartData.length+'件</span>'
+    +'</div>';
+  // 权益信息
+  if(cartBenefit.minAmount>0){
+    html+='<div style="margin-top:8px;padding:8px 12px;background:var(--accent-bg);border-radius:8px;font-size:11px;color:var(--accent);line-height:1.6">'
+      +'🎉 本单权益：'+getBenefitText(cartBenefit)+'</div>';
+  }else if(cartCount<20&&cartCount>0){
+    var diff=20-cartCount;
+    html+='<div style="margin-top:8px;padding:8px 12px;background:var(--warn-bg);border-radius:8px;font-size:11px;color:var(--warn);line-height:1.6">'
+      +'💡 再满'+diff+'件即可享「银卡」权益：包邮 + 赠运动冰巾×5</div>';
+  }
+  html+='</div>';
+
+  html+='<div class="coach-actions">'
+    +'<button class="btn-copy" onclick="copySummary()">📋 复制汇总</button>'
+    +'<button class="btn-excel" onclick="exportExcel()">📥 导出Excel</button>'
+    +'</div>'
+    +'<div style="margin-top:12px">'
+    +'<button class="btn-order" onclick="placeOrder()" style="width:100%;padding:14px;font-size:16px;border-radius:12px;font-weight:700">📦 确认下单（共'+cartData.length+'件）</button>'
+    +'</div>'
+    +'<div class="coach-actions" style="margin-top:8px">'
+    +'<button class="btn-clear" onclick="clearCart()">🗑️ 清空</button>'
+    +'</div>'
+    +'</div>';
+
+  el.innerHTML=html;
+}
+
+async function removeFromCart(idx){
+  var itemName=cartData[idx].name;
+  showConfirm({
+    icon:'🗑️',
+    title:'删除记录',
+    msg:'确定删除「'+itemName+'」的记录吗？',
+    okText:'删除',
+    danger:true,
+    onOk:async function(){
+      var item=cartData[idx];
+      if(item.id){await deleteFromCloud(item.id)}
+      cartData.splice(idx,1);
+      updateBadge();
+      renderCoachView();
+    }
+  });
+}
+
+async function clearCart(){
+  showConfirm({
+    icon:'🗑️',
+    title:'清空选购清单',
+    msg:'确定清空全部选购清单吗？<br><strong style="color:var(--danger)">此操作不可恢复！</strong>',
+    okText:'清空',
+    danger:true,
+    onOk:async function(){
+      await clearFromCloud();
+      cartData=[];
+      updateBadge();
+      renderCoachView();
+    }
+  });
+}
+
+// ===== 复制汇总 =====
+function copySummary(){
+  if(cartData.length===0){showToast('选购清单为空');return}
+  var text='📋 速滑服尺码汇总\n';
+  text+='团队码：'+teamCode+'\n';
+  if(teamProfile&&teamProfile.coach_name) text+='晨哥：'+teamProfile.coach_name+'\n';
+  text+='款式：'+(age==='child'?'儿童款':'成人款')+(addFat?' | 加肥版(+¥20)':'')+'\n';
+  text+='合计：'+cartData.length+'件\n';
+  text+='明细：\n';
+  cartData.forEach(function(item,i){
+    text+=(i+1)+'. '+item.name+' '+item.detail+' → '+item.sz+'码';
+    if(item.addFat) text+=' 🍔加肥版';
+    if(item.scheme) text+='（'+item.scheme+'）';
+    if(item.custom&&item.custom.length>0) text+=' ['+item.custom.join(' | ')+']';
+    text+='\n';
+  });
+  navigator.clipboard.writeText(text).then(function(){
+    showToast('✅ 汇总已复制到剪贴板');
+  }).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    showToast('✅ 汇总已复制');
+  });
+}
+
+// ===== 导出Excel（CSV）=====
+function exportExcel(){
+  if(cartData.length===0){showToast('选购清单为空');return}
+  var csv='\uFEFF序号,姓名,品类,方案,面料,身高/三围,推荐尺码,穿着偏好,定制内容\n';
+  cartData.forEach(function(item,i){
+    var scheme=item.scheme||'';
+    var custom=item.custom?item.custom.join('；'):'';
+    csv+=(i+1)+','+item.name+',速滑服,'+scheme+','+(item.fabric||'')+','+item.detail+','+item.sz+'码,'+(item.addFat?'加肥版(+¥20)':'标准款')+','+custom+'\n';
+  });
+  var sizes=D[age].sizes;
+  var countMap={};
+  sizes.forEach(function(s){countMap[s]=0});
+  cartData.forEach(function(item){countMap[item.sz]=(countMap[item.sz]||0)+1});
+  csv+='\n尺码汇总\n';
+  sizes.forEach(function(s){
+    var c=countMap[s]||0;
+    if(c>0) csv+=s+'码,'+c+'件\n';
+  });
+  csv+='合计,,'+cartData.length+'件\n';
+  var cartBenefit=getBenefitLevel(cartData.length);
+  if(cartBenefit.minAmount>0) csv+='权益,,'+getBenefitText(cartBenefit)+'\n';
+
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='速滑服尺码汇总_'+teamCode+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();URL.revokeObjectURL(url);
+  showToast('✅ 已导出CSV文件');
+}
+
+// ===== 分享给家长 =====
+function openShareModal(){
+  var baseUrl=window.location.href.split('?')[0];
+  var shareUrl=teamCode?baseUrl+'?team='+encodeURIComponent(teamCode):baseUrl;
+  document.getElementById('shareUrlBox').textContent=shareUrl;
+  document.getElementById('shareModal').classList.add('show');
+}
+function closeShareModal(){
+  document.getElementById('shareModal').classList.remove('show');
+}
+function copyShareUrl(){
+  var baseUrl=window.location.href.split('?')[0];
+  var shareUrl=teamCode?baseUrl+'?team='+encodeURIComponent(teamCode):baseUrl;
+  navigator.clipboard.writeText(shareUrl).then(function(){
+    showToast('✅ 链接已复制，可发给家长自助选码');
+  }).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=shareUrl;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    showToast('✅ 链接已复制');
+  });
+}
+
+// ===== 尺码对照弹窗 =====
+function openModal(){
+  var db=D[age];
+  var sizes=db.sizes;
+  var html='<table class="modal-table"><thead><tr><th>尺码</th>';
+  var parts=['胸围','腰围','臀围','大腿围','袖长','衣长','前浪','后浪'];
+  parts.forEach(function(p){html+='<th>'+p+'</th>'});
+  html+='</tr></thead><tbody>';
+  sizes.forEach(function(sz){
+    var isHighlight=lastResult&&lastResult.sz===sz;
+    html+='<tr'+(isHighlight?' class="highlight"':'')+'>';
+    html+='<td>'+sz+'</td>';
+    var cols=[0,5,10,9,20,16,17,17];
+    cols.forEach(function(ci){
+      var v=db.data[sz][ci];
+      if(db.halfIdx.has(ci)) v*=2;
+      v=Math.round(v*SHRINK*10)/10;
+      html+='<td>'+v+'</td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalTitle').textContent=age==='child'?'儿童款成品尺寸对照（整围·含缩率）':'成人款成品尺寸对照（整围·含缩率）';
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+}
+
+// ===== 管理员功能 =====
+var isAdmin=false;
+function adminLogin(){
+  var pw=prompt('请输入管理员密码');
+  if(pw==='CG5166'){
+    isAdmin=true;
+    document.getElementById('adminBar').style.display='block';
+    document.getElementById('adminBtn').style.opacity='1';
+    document.getElementById('adminBtn').style.background='var(--purple-bg)';
+    document.getElementById('adminBtn').style.borderColor='var(--purple)';
+    loadAdminTeams();
+    document.getElementById('adminModal').classList.add('show');
+    showToast('🔑 管理员已登录');
+  }else if(pw!==null){
+    showToast('❌ 密码错误');
+  }
+}
+function adminLogout(){
+  isAdmin=false;
+  document.getElementById('adminBar').style.display='none';
+  document.getElementById('adminBtn').style.opacity='.5';
+  document.getElementById('adminBtn').style.background='';
+  document.getElementById('adminBtn').style.borderColor='';
+  document.getElementById('adminModal').classList.remove('show');
+  showToast('已退出管理员');
+}
+async function loadAdminTeams(){
+  var el=document.getElementById('adminTeamList');
+  if(!el) return;
+  el.innerHTML='<div style="text-align:center;color:var(--text3)">⏳ 加载中...</div>';
+  if(!sb){el.innerHTML='<div style="text-align:center;color:var(--danger)">未连接云端</div>';return}
+  try{
+    var resp=await sb.from('team_profiles').select('*').order('created_at',{ascending:false});
+    if(resp.error){el.innerHTML='<div style="text-align:center;color:var(--danger)">加载失败</div>';return}
+    var teams=resp.data||[];
+    var html='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">共 '+teams.length+' 个团队</div>';
+    teams.forEach(function(t){
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px">';
+      html+='<span><b>'+t.team_code+'</b> '+ (t.coach_name||'') +'</span>';
+      html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+ (t.total_orders||0) +'单</span>';
+      html+='</div>';
+    });
+    el.innerHTML=html;
+  }catch(e){el.innerHTML='<div style="text-align:center;color:var(--danger)">加载异常</div>'}
+}
+
+// ===== 初始化 =====
+(function init(){
+  // 从URL参数中读取团队码（家长通过分享链接进来）
+  var urlParams=new URLSearchParams(window.location.search);
+  var urlTeam=urlParams.get('team');
+  if(urlTeam){
+    teamCode=urlTeam.toUpperCase();
+    loadSchemes();
+    localStorage.setItem('cg_team',teamCode);
+  }
+
+  renderTeamSection();
+  updateBadge();
+
+  // 如果有团队码，自动从云端同步
+  if(teamCode&&sb){
+    loadTeamProfile();
+    syncFromCloud().then(function(){
+      startAutoSync();
+    });
+  }
+})();
+
+// ===== 订单管理 =====
+async function openOrdersModal(){
+  if(!sb||!teamCode){showToast('⚠️ 请先输入团队码');return}
+  document.getElementById('ordersModal').classList.add('show');
+  await loadOrders();
+}
+
+function closeOrdersModal(){
+  document.getElementById('ordersModal').classList.remove('show');
+}
+
+async function loadOrders(){
+  var el=document.getElementById('ordersContent');
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">⏳ 加载中...</div>';
+  try{
+    var orderQuery=sb.from('orders').select('*');
+    if(!isAdmin) orderQuery=orderQuery.eq('team_code',teamCode);
+    var resp=await orderQuery.order('created_at',{ascending:false});
+    if(resp.error){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">加载失败</div>';return}
+
+    var orders=resp.data||[];
+    if(orders.length===0){
+      el.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">📋 暂无订单</div>';
+      return;
+    }
+
+    var unpaid=orders.filter(function(o){return o.status==='unpaid'});
+    var paid=orders.filter(function(o){return o.status==='paid'});
+
+    var html='';
+
+    // 待确认订单
+    if(unpaid.length>0){
+      html+='<div style="margin-bottom:16px">';
+      html+='<div style="font-size:14px;font-weight:700;color:var(--warn);margin-bottom:10px;display:flex;align-items:center;gap:6px">';
+      html+='<span style="background:var(--warn-bg);color:var(--warn);padding:2px 8px;border-radius:8px;font-size:11px">待确认</span>';
+      html+=unpaid.length+'笔</div>';
+      unpaid.forEach(function(o){
+        var items=o.items||[];
+        var adminTag=isAdmin?'<span style="font-size:10px;background:var(--purple-bg);color:var(--purple);padding:1px 5px;border-radius:3px;margin-right:4px">'+o.team_code+'</span>':'';
+        var itemStr=items.map(function(it){return it.name+'('+it.size+'码)'}).join('、');
+        var time=o.created_at?o.created_at.substring(0,16).replace('T',' '):'';
+        var orderNo=o.order_no||o.id.substring(0,8);
+        html+='<div style="background:var(--warn-bg);border-radius:10px;padding:12px;margin-bottom:8px">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+        html+='<span style="font-size:12px;color:var(--text3)">'+adminTag+'📋 '+orderNo+'</span>';
+        html+='<span style="font-size:12px;color:var(--text3)">'+time+'</span>';
+        html+='</div>';
+        html+='<div style="font-size:13px;color:var(--text);margin-bottom:4px">'+itemStr+'</div>';
+        // 显示收货信息
+        if(o.shipping_name){
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📦 '+o.shipping_name+' '+o.shipping_phone+'</div>';
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:6px">📍 '+o.shipping_address+'</div>';
+        }
+        html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+        html+='<span style="font-size:16px;font-weight:700;color:var(--accent)">'+o.total_items+'件</span>';
+        html+='<div style="display:flex;gap:8px">';
+        html+='<button onclick="deleteOrder(\''+o.id+'\','+o.total_items+')" style="padding:8px 12px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--danger);color:#fff">🗑️</button>';
+        html+='<button onclick="viewOrderDetail(\''+o.id+'\')" style="padding:8px 10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--accent2);color:#fff">📋</button>';
+        html+='<button onclick="confirmPayment(\''+o.id+'\','+o.total_items+')" style="padding:8px 16px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff">✅ 确认收款</button>';
+        html+='</div>';
+        html+='</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+
+    // 已确认订单
+    if(paid.length>0){
+      html+='<div>';
+      html+='<div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px">';
+      html+='<span style="background:var(--accent-bg);color:var(--accent);padding:2px 8px;border-radius:8px;font-size:11px">已确认</span>';
+      html+=paid.length+'笔</div>';
+      paid.forEach(function(o){
+        var items=o.items||[];
+        var adminTag=isAdmin?'<span style="font-size:10px;background:var(--purple-bg);color:var(--purple);padding:1px 5px;border-radius:3px;margin-right:4px">'+o.team_code+'</span>':'';
+        var itemStr=items.map(function(it){return it.name+'('+it.size+'码)'}).join('、');
+        var time=o.created_at?o.created_at.substring(0,16).replace('T',' '):'';
+        var orderNo=o.order_no||o.id.substring(0,8);
+        html+='<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:8px">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+        html+='<span style="font-size:12px;color:var(--text3)">'+adminTag+'📋 '+orderNo+'</span>';
+        html+='<span style="font-size:12px;color:var(--text3)">'+time+'</span>';
+        html+='</div>';
+        html+='<div style="font-size:12px;color:var(--text2);margin-bottom:4px">'+itemStr+'</div>';
+        if(o.shipping_name){
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📦 '+o.shipping_name+' '+o.shipping_phone+'</div>';
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📍 '+o.shipping_address+'</div>';
+        }
+        html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+        html+='<span style="font-size:14px;font-weight:600;color:var(--accent)">'+o.total_items+'件'+(o.total_amount>0?' · ¥'+o.total_amount:'')+'</span>';
+        html+='<div style="display:flex;gap:8px">';
+        html+='<button onclick="deleteOrder(\''+o.id+'\','+o.total_items+')" style="padding:6px 10px;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;background:var(--danger);color:#fff;opacity:0.7">🗑️</button>';
+        html+='<button onclick="viewOrderDetail(\''+o.id+'\')" style="padding:6px 14px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--accent2);color:#fff">📋 详情/导出</button>';
+        html+='</div>';
+        html+='</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">加载失败</div>';
+  }
+}
+
+async function confirmPayment(orderId,totalItems){
+  // 弹出输入框让晨哥填写成交价格
+  var inputHtml='<div style="text-align:center">'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">本单共 <b>'+totalItems+'</b> 件，请输入最终成交价格</div>'
+    +'<input type="number" id="manualPriceInput" placeholder="如：3600" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:18px;text-align:center;outline:none" oninput="this.style.borderColor=this.value?\'var(--accent)\':\'var(--border)\'">'
+    +'</div>';
+
+  showConfirm({
+    icon:'💰',
+    title:'确认收款',
+    msg:inputHtml,
+    okText:'确认收款',
+    onOk:async function(){
+      var priceInput=document.getElementById('manualPriceInput');
+      var finalPrice=priceInput?parseFloat(priceInput.value):0;
+      if(!finalPrice||finalPrice<=0){
+        showToast('⚠️ 请输入有效的成交价格');
+        return;
+      }
+      try{
+        // 更新订单状态和金额
+        var resp=await sb.from('orders').update({status:'paid',total_amount:finalPrice}).eq('id',orderId);
+        if(resp.error){showToast('⚠️ 操作失败：'+resp.error.message);return}
+
+        // 更新团队累计件数和金额
+        var newOrders=(teamProfile?teamProfile.total_orders:0)+1;
+        var newAmount=(teamProfile?parseFloat(teamProfile.total_amount||0):0)+finalPrice;
+        await sb.from('team_profiles').update({
+          total_orders:newOrders,
+          total_amount:newAmount
+        }).eq('team_code',teamCode);
+
+        // 刷新
+        await loadTeamProfile();
+        renderTeamSection();
+        await loadOrders();
+
+        var newBenefit=getBenefitLevel(newAmount);
+        showToast('✅ 收款确认！累计¥'+newAmount.toFixed(0)+' · '+newBenefit.label+'客户');
+      }catch(e){
+        showToast('⚠️ 操作失败，请重试');
+      }
+    }
+  });
+}
+
+// ===== 删除订单 =====
+async function deleteOrder(orderId,totalItems){
+  showConfirm({
+    icon:'🗑️',
+    title:'删除订单',
+    msg:'确定要删除该订单吗？<br><br>删除后无法恢复，请确认客户是下错单需要取消。',
+    okText:'确认删除',
+    onOk:async function(){
+      try{
+        // 先查询订单状态和金额
+        var orderResp=await sb.from('orders').select('*').eq('id',orderId);
+        if(orderResp.error||!orderResp.data||orderResp.data.length===0){
+          showToast('⚠️ 订单不存在');return;
+        }
+        var order=orderResp.data[0];
+
+        // 删除订单
+        var resp=await sb.from('orders').delete().eq('id',orderId);
+        if(resp.error){showToast('⚠️ 删除失败：'+resp.error.message);return}
+
+        // 如果是已付款订单，需要回退团队累计数据
+        if(order.status==='paid'&&order.total_amount>0){
+          var newOrders=Math.max(0,(teamProfile?teamProfile.total_orders:0)-1);
+          var newAmount=Math.max(0,(teamProfile?parseFloat(teamProfile.total_amount||0):0)-parseFloat(order.total_amount));
+          await sb.from('team_profiles').update({
+            total_orders:newOrders,
+            total_amount:newAmount
+          }).eq('team_code',teamCode);
+        }
+
+        // 刷新
+        await loadTeamProfile();
+        renderTeamSection();
+        await loadOrders();
+        showToast('🗑️ 订单已删除');
+      }catch(e){
+        showToast('⚠️ 删除失败，请重试');
+      }
+    }
+  });
+}
+
+// ===== 订单详情 & 导出 =====
+var _currentOrderData=null;
+
+async function viewOrderDetail(orderId){
+  if(!sb){showToast('⚠️ 未连接云端');return}
+  try{
+    var resp=await sb.from('orders').select('*').eq('id',orderId);
+    if(resp.error||!resp.data||resp.data.length===0){showToast('⚠️ 订单不存在');return}
+    var o=resp.data[0];
+    _currentOrderData=o;
+
+    var items=o.items||[];
+    var el=document.getElementById('orderDetailContent');
+    var html='';
+
+    // 基本信息
+    html+='<div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html+='<div style="font-size:12px;color:var(--text3);margin-bottom:6px">基本信息</div>';
+    html+='<div style="font-size:13px;line-height:2">';
+    html+='<div>📋 订单编号：<b>'+(o.order_no||o.id.substring(0,8))+'</b></div>';
+    html+='<div>📅 下单日期：'+(o.created_at?o.created_at.substring(0,10):'')+'</div>';
+    html+='<div>🏷️ 团队码：'+o.team_code+'</div>';
+    html+='<div>👕 件数：<b style="color:var(--accent)">'+o.total_items+'件</b></div>';
+    if(o.status==='paid'&&o.total_amount>0){
+      html+='<div>💰 成交价：<b style="color:var(--accent)">¥'+o.total_amount+'</b></div>';
+    }
+    html+='<div>📦 状态：'+(o.status==='paid'?'✅ 已确认':'⏳ 待确认')+'</div>';
+    if(o.fabric) html+='<div>🧵 面料：'+o.fabric+'</div>';
+    if(o.stitch) html+='<div>🪡 工艺：'+o.stitch+'</div>';
+    if(o.remark) html+='<div>📝 备注：<span style="color:var(--text2)">'+o.remark+'</span></div>';
+    html+='</div></div>';
+
+    // 收货信息
+    if(o.shipping_name){
+      html+='<div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:10px">';
+      html+='<div style="font-size:12px;color:var(--text3);margin-bottom:6px">收货信息</div>';
+      html+='<div style="font-size:13px;line-height:2">';
+      html+='<div>👤 收货人：'+o.shipping_name+'</div>';
+      html+='<div>📱 电话：'+o.shipping_phone+'</div>';
+      html+='<div>📍 地址：'+o.shipping_address+'</div>';
+      html+='</div></div>';
+    }
+
+    // 商品明细
+    html+='<div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html+='<div style="font-size:12px;color:var(--text3);margin-bottom:6px">商品明细</div>';
+
+    // 按儿童款/成人款+尺码分组
+    var childSizes=[110,120,130,140,150,155];
+    var adultSizes=['XS','S','M','L','XL','2XL','3XL','5XL'];
+    var childItems=items.filter(function(it){return it.age==='child'});
+    var adultItems=items.filter(function(it){return it.age!=='child'});
+
+    // 儿童款尺码统计
+    if(childItems.length>0){
+      html+='<div style="margin-bottom:8px"><b>儿童款</b></div>';
+      html+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center;margin-bottom:8px">';
+      childSizes.forEach(function(sz){
+        var count=childItems.filter(function(it){return it.size===sz}).length;
+        html+='<div style="padding:6px 4px;background:'+(count>0?'var(--accent-bg)':'var(--bg)')+';border-radius:6px;font-size:12px">';
+        html+='<div style="font-weight:600;color:'+(count>0?'var(--accent)':'var(--text3)')+'">'+sz+'</div>';
+        html+='<div style="font-size:14px;font-weight:700;color:var(--accent)">'+count+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+      html+='<div style="font-size:12px;color:var(--text2)">小计：'+childItems.length+'件</div>';
+    }
+
+    // 成人款尺码统计
+    if(adultItems.length>0){
+      html+='<div style="margin-top:10px;margin-bottom:8px"><b>成人款</b></div>';
+      html+='<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px;text-align:center;margin-bottom:8px">';
+      adultSizes.forEach(function(sz){
+        var count=adultItems.filter(function(it){return it.size===sz}).length;
+        html+='<div style="padding:6px 2px;background:'+(count>0?'var(--accent-bg)':'var(--bg)')+';border-radius:6px;font-size:11px">';
+        html+='<div style="font-weight:600;color:'+(count>0?'var(--accent)':'var(--text3)')+'">'+sz+'</div>';
+        html+='<div style="font-size:13px;font-weight:700;color:var(--accent)">'+count+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+      html+='<div style="font-size:12px;color:var(--text2)">小计：'+adultItems.length+'件</div>';
+    }
+    html+='</div>';
+
+    // 加载该订单团队的方案效果图
+    var orderSchemes=JSON.parse(localStorage.getItem('cg_schemes_'+o.team_code)||'[]');
+    var schemeMap={};
+    orderSchemes.forEach(function(s){schemeMap[s.name]=s});
+
+    // 人员列表
+    html+='<div style="background:var(--bg);border-radius:10px;padding:14px">';
+    html+='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">人员列表 ('+items.length+'人)</div>';
+    html+='<div style="max-height:200px;overflow-y:auto">';
+    items.forEach(function(it,i){
+      var fitLabel=it.addFat?'🍔 加肥':'标准';
+      var sch=schemeMap[it.scheme];
+      var schemeHtml='';
+      if(sch&&sch.imgData){
+        schemeHtml='<span style="display:inline-flex;align-items:center;gap:4px;margin-left:6px">'
+          +'<img src="'+sch.imgData+'" style="width:44px;height:44px;border-radius:6px;object-fit:cover;border:1px solid var(--border)" alt="'+sch.name+'">'
+          +'<span style="font-size:10px;color:var(--accent)">'+sch.name+'</span></span>';
+      }else if(it.scheme){
+        schemeHtml='<span style="font-size:10px;color:var(--accent);margin-left:6px">🎨 '+it.scheme+'</span>';
+      }
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">';
+      html+='<span>'+(i+1)+'. '+it.name+schemeHtml+(it.fabric?'<span style="font-size:10px;color:var(--purple);margin-left:4px">🧵 '+it.fabric+'</span>':'')+'</span>';
+      html+='<span style="color:var(--text3)">'+it.size+'码 · '+fitLabel+'</span>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+
+    el.innerHTML=html;
+    document.getElementById('orderDetailModal').classList.add('show');
+  }catch(e){
+    showToast('⚠️ 加载失败');
+  }
+}
+
+function exportCurrentOrder(){
+  if(!_currentOrderData){showToast('⚠️ 无订单数据');return}
+  var o=_currentOrderData;
+  var items=o.items||[];
+
+  // 尺码映射（儿童码用数字，成人码用字母）
+  var childSizes=[110,120,130,140,150,155];
+  var adultSizes=['XS','S','M','L','XL','2XL','3XL','5XL'];
+  var allSizes=childSizes.concat(adultSizes);
+  var childItems=items.filter(function(it){return it.age==='child'});
+  var adultItems=items.filter(function(it){return it.age!=='child'});
+
+  // 构建Excel数据
+  var data=[];
+
+  // Row 1-2: 订单名称（合并）
+  data.push(['订单名称：速滑服连体款 - '+o.team_code,'','','','','','','','','','','','']);
+  data.push(['','','','','','','','','','','','','']);
+
+  // Row 3: 订单编号 + 下单日期
+  data.push(['订单编号：',o.order_no||o.id.substring(0,8),'','','','下单日期：',o.created_at?o.created_at.substring(0,10):'','','','','','','']);
+
+  // Row 4: 收货地址
+  data.push(['收货地址：',o.shipping_name||'',o.shipping_phone||'',o.shipping_address||'','','','','','','','','','']);
+
+  // Row 5: 运输方式 + 交货日期
+  data.push(['运输方式：','圆通快递','','','','交货日期：','7到10天','','','','','','']);
+
+  // Row 6: 订单信息
+  data.push(['订单信息：','','','','','','','','','','','','']);
+
+  // Row 7: 面料
+  var fabric='梭织+防水透气膜+数码印花';
+  data.push(['','','','','','面料：',fabric,'','','','','','']);
+
+  // Row 8: 备注
+  data.push(['','','','','','备注','','','','','','','']);
+
+  // Row 9: 款式
+  var fitLabel='';
+  if(childItems.length>0&&adultItems.length>0) fitLabel='儿童款+成人款';
+  else if(childItems.length>0) fitLabel='儿童款';
+  else fitLabel='成人款';
+  data.push(['','','','','','款式：',fitLabel,'','','','','','']);
+
+  // Row 10: 表头（6个儿童码 + 8个成人码）
+  var row10=['总价格','儿童款'];
+  childSizes.forEach(function(sz){row10.push(sz)});
+  row10=row10.concat(['数量','价格','总价']);
+
+  data.push(row10);
+
+  // Row 11: 儿童款数据
+  var childCounts=childSizes.map(function(sz){return childItems.filter(function(it){return it.size==sz}).length});
+  var childTotal=childItems.length;
+
+  row11=['',''];
+  childCounts.forEach(function(c){row11.push(c)});
+  row11.push(childTotal);
+  row11.push('');
+  row11.push('');
+  data.push(row11);
+
+  // Row 12: 成人款表头
+  var row12=['','成人款'];
+  adultSizes.forEach(function(sz){row12.push(sz)});
+  row12=row12.concat(['数量','价格','总价']);
+  data.push(row12);
+
+  // Row 13: 成人款数据
+  var row13=['',''];
+  var adultCounts=adultSizes.map(function(sz){return adultItems.filter(function(it){return it.size===sz}).length});
+  var adultTotal=adultItems.length;
+  adultCounts.forEach(function(c){row13.push(c)});
+  row13.push(adultTotal);
+  row13.push('');
+  row13.push('');
+  data.push(row13);
+
+  // Row 14: 合计（价格留空，晨哥手动填）
+  data.push(['','合计','','','','','','','','','','','']);
+
+  // 创建工作簿
+  var ws=XLSX.utils.aoa_to_sheet(data);
+
+  // 设置列宽
+  ws['!cols']=[
+    {wch:10},{wch:8},{wch:5},{wch:5},{wch:5},{wch:5},{wch:5},{wch:5},
+    {wch:5},{wch:5},{wch:8},{wch:8},{wch:10}
+  ];
+
+  // 设置合并单元格
+  ws['!merges']=[
+    {s:{r:0,c:0},e:{r:1,c:12}},  // A1:M2 订单名称
+    {s:{r:2,c:1},e:{r:2,c:4}},    // B3:E3 订单编号值
+    {s:{r:2,c:5},e:{r:2,c:9}},    // F3:J3 下单日期标签
+    {s:{r:3,c:1},e:{r:3,c:12}},   // B4:M4 收货地址值
+    {s:{r:4,c:1},e:{r:4,c:4}},    // B5:E5 运输方式值
+    {s:{r:4,c:5},e:{r:4,c:9}},    // F5:J5 交货日期标签
+    {s:{r:4,c:10},e:{r:4,c:12}},  // K5:M5 交货日期值
+    {s:{r:5,c:0},e:{r:5,c:12}},   // A6:M6 订单信息
+    {s:{r:6,c:0},e:{r:8,c:3}},    // A7:D9 产品图区域
+    {s:{r:6,c:4},e:{r:6,c:5}},    // E7:F7 面料标签
+    {s:{r:6,c:6},e:{r:6,c:12}},   // G7:M7 面料值
+    {s:{r:7,c:4},e:{r:7,c:5}},    // E8:F8 备注
+    {s:{r:7,c:6},e:{r:7,c:12}},   // G8:M8 备注值
+    {s:{r:8,c:4},e:{r:8,c:5}},    // E9:F9 款式标签
+    {s:{r:8,c:6},e:{r:8,c:12}},   // G9:M9 款式值
+    {s:{r:9,c:0},e:{r:13,c:0}},   // A10:A14 总价格
+    {s:{r:9,c:1},e:{r:10,c:1}},   // B10:B11 儿童款
+    {s:{r:11,c:1},e:{r:12,c:1}},  // B12:B13 成人款
+    {s:{r:13,c:1},e:{r:13,c:11}}  // B14:L14 合计标签
+  ];
+
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'订单详情');
+
+  // 下载
+  var fileName='订单详情_'+o.team_code+'_'+(o.created_at?o.created_at.substring(0,10):'')+'_'+o.id.substring(0,8)+'.xlsx';
+  XLSX.writeFile(wb,fileName);
+  showToast('✅ 订单详情已导出');
+}
+</script>
+<!-- 全局错误日志（有JS错误时底部红条提示） -->
+<div id="globalErrorLog" style="position:fixed;bottom:0;left:0;right:0;background:#ffe0e0;color:#c00;font-size:11px;padding:4px 8px;z-index:9999;display:none;cursor:pointer" onclick="this.style.display='none'"></div>
+<script>
+var _errEl=document.getElementById('globalErrorLog');
+var _origOnError=window.onerror;
+window.onerror=function(msg,src,line,col,err){
+  _errEl.style.display='block';
+  _errEl.textContent='❌ '+msg+' (行'+line+')';
+  if(_origOnError) _origOnError(msg,src,line,col,err);
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  _errEl.style.display='block';
+  _errEl.textContent='❌ Promise: '+(e.reason&&e.reason.message||e.reason);
+});
+</script>
+<!-- 管理员面板 -->
+<div class="modal-bg" id="adminModal" onclick="if(event.target===this)document.getElementById('adminModal').classList.remove('show')">
+  <div class="modal">
+    <h3>🔑 管理员面板</h3>
+    <div style="margin:12px 0">
+      <button onclick="loadAdminTeams()" style="width:100%;padding:10px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px">📋 刷新团队列表</button>
+      <div id="adminTeamList" style="max-height:300px;overflow-y:auto;font-size:13px;line-height:2"></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="close" style="flex:1;background:var(--danger);color:#fff" onclick="adminLogout()">退出管理</div>
+      <div class="close" style="flex:1;color:var(--text2)" onclick="document.getElementById('adminModal').classList.remove('show')">关闭</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
