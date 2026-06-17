@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -2397,9 +2397,21 @@ function closeModal(){
 
 // ===== 管理员功能 =====
 var isAdmin=false;
-function adminLogin(){
+// SHA-256 哈希函数（浏览器原生 Web Crypto）
+async function sha256(text){
+  var enc=new TextEncoder().encode(text);
+  var buf=await crypto.subtle.digest('SHA-256',enc);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+}
+// HTML 转义函数（防 XSS）
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+async function adminLogin(){
   var pw=prompt('请输入管理员密码');
-  if(pw==='CG5166'){
+  if(!pw){ return; }
+  var hash=await sha256(pw);
+  if(hash==='d99e79ccafe31ab1e6117774f424ef9b822098f37c1441c683797ea67bb88b33'){
     isAdmin=true;
     document.getElementById('adminBar').style.display='block';
     document.getElementById('adminBtn').style.opacity='1';
@@ -2408,7 +2420,7 @@ function adminLogin(){
     loadAdminTeams();
     document.getElementById('adminModal').classList.add('show');
     showToast('🔑 管理员已登录');
-  }else if(pw!==null){
+  }else{
     showToast('❌ 密码错误');
   }
 }
@@ -2433,7 +2445,7 @@ async function loadAdminTeams(){
     var html='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">共 '+teams.length+' 个团队</div>';
     teams.forEach(function(t){
       html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px">';
-      html+='<span><b>'+t.team_code+'</b> '+ (t.coach_name||'') +'</span>';
+      html+='<span><b>'+escHtml(t.team_code)+'</b> '+escHtml(t.coach_name||'')+'</span>';
       html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+ (t.total_orders||0) +'单</span>';
       html+='</div>';
     });
