@@ -2460,7 +2460,10 @@ async function loadOrders(){
         // 显示收货信息
         if(o.shipping_name){
           html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📦 '+o.shipping_name+' '+o.shipping_phone+'</div>';
-          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:6px">📍 '+o.shipping_address+'</div>';
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📍 '+o.shipping_address+'</div>';
+        }
+        if(o.fabric||o.stitch){
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🪡 '+o.stitch:'')+'</div>';
         }
         html+='<div style="display:flex;justify-content:space-between;align-items:center">';
         html+='<span style="font-size:16px;font-weight:700;color:var(--accent)">'+o.total_items+'件</span>';
@@ -2496,6 +2499,9 @@ async function loadOrders(){
         if(o.shipping_name){
           html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📦 '+o.shipping_name+' '+o.shipping_phone+'</div>';
           html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📍 '+o.shipping_address+'</div>';
+        }
+        if(o.fabric||o.stitch){
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🪡 '+o.stitch:'')+'</div>';
         }
         html+='<div style="display:flex;justify-content:space-between;align-items:center">';
         html+='<span style="font-size:14px;font-weight:600;color:var(--accent)">'+o.total_items+'件'+(o.total_amount>0?' · ¥'+o.total_amount:'')+'</span>';
@@ -2752,13 +2758,17 @@ function exportCurrentOrder(){
   data.push(['订单信息：','','','','','','','','','','','','']);
 
   // Row 7: 面料
-  var fabric=currentFabric?fabrics.find(function(f){return f.id===currentFabric}).name:'';
+  var fabric=o.fabric||'';
   data.push(['','','','','','面料：',fabric,'','','','','','']);
 
-  // Row 8: 备注
+  // Row 8: 缝纫工艺
+  var stitch=o.stitch||'';
+  data.push(['','','','','','工艺：',stitch,'','','','','','']);
+
+  // Row 9: 备注
   data.push(['','','','','','备注','','','','','','','']);
 
-  // Row 9: 款式
+  // Row 10: 款式
   var fitLabel='';
   if(childItems.length>0&&adultItems.length>0) fitLabel='儿童款+成人款';
   else if(childItems.length>0) fitLabel='儿童款';
@@ -2821,17 +2831,19 @@ function exportCurrentOrder(){
     {s:{r:4,c:5},e:{r:4,c:9}},    // F5:J5 交货日期标签
     {s:{r:4,c:10},e:{r:4,c:12}},  // K5:M5 交货日期值
     {s:{r:5,c:0},e:{r:5,c:12}},   // A6:M6 订单信息
-    {s:{r:6,c:0},e:{r:8,c:3}},    // A7:D9 产品图区域
+    {s:{r:6,c:0},e:{r:9,c:3}},    // A7:D10 产品图区域
     {s:{r:6,c:4},e:{r:6,c:5}},    // E7:F7 面料标签
     {s:{r:6,c:6},e:{r:6,c:12}},   // G7:M7 面料值
-    {s:{r:7,c:4},e:{r:7,c:5}},    // E8:F8 备注
-    {s:{r:7,c:6},e:{r:7,c:12}},   // G8:M8 备注值
-    {s:{r:8,c:4},e:{r:8,c:5}},    // E9:F9 款式标签
-    {s:{r:8,c:6},e:{r:8,c:12}},   // G9:M9 款式值
-    {s:{r:9,c:0},e:{r:13,c:0}},   // A10:A14 总价格
-    {s:{r:9,c:1},e:{r:10,c:1}},   // B10:B11 儿童款
-    {s:{r:11,c:1},e:{r:12,c:1}},  // B12:B13 成人款
-    {s:{r:13,c:1},e:{r:13,c:11}}  // B14:L14 合计标签
+    {s:{r:7,c:4},e:{r:7,c:5}},    // E8:F8 工艺标签
+    {s:{r:7,c:6},e:{r:7,c:12}},   // G8:M8 工艺值
+    {s:{r:8,c:4},e:{r:8,c:5}},    // E9:F9 备注
+    {s:{r:8,c:6},e:{r:8,c:12}},   // G9:M9 备注值
+    {s:{r:9,c:4},e:{r:9,c:5}},    // E10:F10 款式标签
+    {s:{r:9,c:6},e:{r:9,c:12}},   // G10:M10 款式值
+    {s:{r:10,c:0},e:{r:14,c:0}},  // A11:A15 总价格
+    {s:{r:10,c:1},e:{r:11,c:1}},  // B11:B12 儿童款
+    {s:{r:12,c:1},e:{r:13,c:1}},  // B13:B14 成人款
+    {s:{r:14,c:1},e:{r:14,c:11}}  // B15:L15 合计标签
   ];
 
   var wb=XLSX.utils.book_new();
