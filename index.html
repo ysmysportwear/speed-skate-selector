@@ -2332,6 +2332,7 @@ function adminLogin(){
   var pw=prompt('请输入管理员密码');
   if(pw==='CG5166'){
     isAdmin=true;
+    localStorage.setItem('cg_admin','1');
     document.getElementById('adminBar').style.display='block';
     document.getElementById('adminBtn').style.opacity='1';
     document.getElementById('adminBtn').style.background='var(--purple-bg)';
@@ -2345,6 +2346,7 @@ function adminLogin(){
 }
 function adminLogout(){
   isAdmin=false;
+  localStorage.removeItem('cg_admin');
   document.getElementById('adminBar').style.display='none';
   document.getElementById('adminBtn').style.opacity='.5';
   document.getElementById('adminBtn').style.background='';
@@ -2399,6 +2401,14 @@ async function deleteTeam(teamCode,totalOrders){
 }
 // ===== 初始化 =====
 (function init(){
+  // 自动恢复管理员登录
+  if(localStorage.getItem('cg_admin')==='1'){
+    isAdmin=true;
+    document.getElementById('adminBar').style.display='block';
+    document.getElementById('adminBtn').style.opacity='1';
+    document.getElementById('adminBtn').style.background='var(--purple-bg)';
+    document.getElementById('adminBtn').style.borderColor='var(--purple)';
+  }
   // 从URL参数中读取团队码（家长通过分享链接进来）
   var urlParams=new URLSearchParams(window.location.search);
   var urlTeam=urlParams.get('team');
