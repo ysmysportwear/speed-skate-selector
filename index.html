@@ -1,4 +1,4 @@
-﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1242,15 +1242,14 @@ function confirmOrderConfig(){
   document.getElementById('orderConfigModal').classList.remove('show');
 
   var cartCount=cartData.length;
+  var fabric=fabrics.find(function(f){return f.id===currentFabric});
+  var fabricName=fabric?fabric.name.replace(/\\n/g,''):'';
+  var stitch=stitchOptions.find(function(s){return s.id===currentStitch});
+  var stitchName=stitch?stitch.name:'';
   var snapshotItems=cartData.map(function(it){
     return {name:it.name,detail:it.detail,size:it.sz,age:it.age,addFat:it.addFat,scheme:it.scheme,custom:it.custom,
       fabric:fabricName,stitch:stitchName,_ship:{name:ship.shipName,phone:ship.shipPhone,addr:ship.shipAddr}};
   });
-  var fabric=fabrics.find(function(f){return f.id===currentFabric});
-  var fabricName=fabric?fabric.name.replace(/\n/g,''):'';
-  var stitch=stitchOptions.find(function(s){return s.id===currentStitch});
-  var stitchName=stitch?stitch.name:'';
-
   window._pendingOrder={items:snapshotItems,count:cartCount,
     shipName:ship.shipName,shipPhone:ship.shipPhone,shipAddr:ship.shipAddr,
     fabric:fabricName,stitch:stitchName,remark:remark};
