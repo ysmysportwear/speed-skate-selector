@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1243,7 +1243,8 @@ function confirmOrderConfig(){
 
   var cartCount=cartData.length;
   var snapshotItems=cartData.map(function(it){
-    return {name:it.name,detail:it.detail,size:it.sz,age:it.age,addFat:it.addFat,scheme:it.scheme,custom:it.custom};
+    return {name:it.name,detail:it.detail,size:it.sz,age:it.age,addFat:it.addFat,scheme:it.scheme,custom:it.custom,
+      fabric:fabricName,stitch:stitchName,_ship:{name:ship.shipName,phone:ship.shipPhone,addr:ship.shipAddr}};
   });
   var fabric=fabrics.find(function(f){return f.id===currentFabric});
   var fabricName=fabric?fabric.name.replace(/\n/g,''):'';
@@ -2617,6 +2618,10 @@ async function viewOrderDetail(orderId){
     _currentOrderData=o;
 
     var items=o.items||[];
+    // 从items回填缺失的订单级字段（兼容旧订单）
+    if(!o.fabric&&items.length>0){var f0=items.find(function(it){return it.fabric});if(f0) o.fabric=f0.fabric}
+    if(!o.stitch&&items.length>0){var s0=items.find(function(it){return it.stitch});if(s0) o.stitch=s0.stitch}
+    if(!o.shipping_name&&items.length>0){var sh=items.find(function(it){return it._ship});if(sh){o.shipping_name=sh._ship.name||'';o.shipping_phone=sh._ship.phone||'';o.shipping_address=sh._ship.addr||''}}
     var el=document.getElementById('orderDetailContent');
     var html='';
 
