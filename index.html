@@ -2417,7 +2417,8 @@ async function deleteTeam(teamCode,totalOrders){
 
 // ===== 订单管理 =====
 async function openOrdersModal(){
-  if(!sb||!teamCode){showToast('⚠️ 请先输入团队码');return}
+  if(!sb){showToast('⚠️ 未连接云端');return}
+  if(!teamCode&&!window._adminViewTeam){showToast('⚠️ 请先输入团队码');return}
   document.getElementById('ordersModal').classList.add('show');
   await loadOrders();
 }
