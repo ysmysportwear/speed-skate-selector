@@ -2439,7 +2439,7 @@ async function loadAdminTeams(){
   el.innerHTML='<div style="text-align:center;color:var(--text3)">⏳ 加载中...</div>';
   if(!sb){el.innerHTML='<div style="text-align:center;color:var(--danger)">未连接云端</div>';return}
   try{
-    var resp=await sb.from('team_profiles').select('*').order('created_at',{ascending:false});
+    var resp=await sb.from('team_profiles').select('*').eq('system','skate').order('created_at',{ascending:false});
     if(resp.error){el.innerHTML='<div style="text-align:center;color:var(--danger)">加载失败</div>';return}
     var teams=resp.data||[];
     var html='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">共 '+teams.length+' 个团队</div>';
@@ -2933,7 +2933,7 @@ async function deleteTeam(code){
   try{
     await sb.from('cart_items').delete().eq('team_code',code);
     await sb.from('orders').delete().eq('team_code',code);
-    await sb.from('team_profiles').delete().eq('team_code',code);
+    await sb.from('team_profiles').delete().eq('team_code',code).eq('system','skate');
     showToast('Deleted: '+code);
     loadAdminTeams();
   }catch(e){showToast('Delete failed')}
