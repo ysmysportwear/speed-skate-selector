@@ -2329,8 +2329,13 @@ function closeModal(){
 // ===== 管理员功能 =====
 var isAdmin=false;
 function adminLogin(){
+  if(isAdmin){
+    loadAdminTeams();
+    document.getElementById('adminModal').classList.add('show');
+    return;
+  }
   var pw=prompt('请输入管理员密码');
-  if(pw==='CG5166'){
+  if(pw==='LOL365'){
     isAdmin=true;
     localStorage.setItem('cg_admin','1');
     document.getElementById('adminBar').style.display='block';
