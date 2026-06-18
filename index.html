@@ -1863,45 +1863,41 @@ function calc(){
 
 function calcByH(h,w,db){
   var sizes=db.sizes;
-  // 找最接近身高的尺码作为基准
+  var wtRef=db.wtRef;
+  if(age==='child'){
+    sizes=CHILD_SIZES.concat(ADULT_SIZES);
+    wtRef=Object.assign({},D.child.wtRef,D.adult.wtRef);
+  }
   var best=0,minD=999;
   sizes.forEach(function(s,i){var d=Math.abs(s-h);if(d<minD){minD=d;best=i}});
   var idx=best;
   var autoFat=false;
-
-  // 体重加码逻辑（2026-06-17 v4 每8kg一档）：
-  // 标准路线（不加价）：超标≤8kg不加码，每超8kg +1码
-  // 加肥路线（+¥20）：  超标8~16kg加肥不加码，≥16kg每超8kg +1码+加肥
   if(w>0){
-    var ref=db.wtRef[sizes[idx]];
+    var ref=wtRef[sizes[idx]];
     if(ref&&w>ref.f){
       var overWeight=w-ref.f;
       if(overWeight>8){
         if(addFat){
-          // 加肥路线：8~16kg→加肥不加码；≥16kg→每8kg +1码+加肥
           if(overWeight>=16){
             var fatSteps=Math.floor((overWeight-8)/8);
             idx=Math.min(idx+fatSteps,sizes.length-1);
           }
           autoFat=true;
         }else{
-          // 标准路线：每超8kg +1码
           var steps=Math.floor(overWeight/8);
           idx=Math.min(idx+steps,sizes.length-1);
           autoFat=false;
         }
       }
     }
-    // 体重过轻，考虑减一码（仅在身高接近小一码时）
     if(ref&&w<ref.m*0.7&&idx>0&&sizes[idx]-h>=5)idx--;
   }
-  // 存储加肥标记供后续使用
   window._calcAutoFat=autoFat;
-
   return sizes[idx];
 }
 
 function calcByM(chest,hip,thigh,fitType,db){
+  if(age==='child'){db=Object.assign({},db,{sizes:CHILD_SIZES.concat(ADULT_SIZES)});var ad=D.adult;db.data=Object.assign({},db.data,ad.data);db.wtRef=Object.assign({},db.wtRef,ad.wtRef);db.bodyRef=Object.assign({},db.bodyRef,ad.bodyRef)}
   var sizes=db.sizes;
   var ideal=fitType==='tight'?-4:3;
   var rangeMin=fitType==='tight'?-8:-2;
@@ -1938,6 +1934,7 @@ function calcByM(chest,hip,thigh,fitType,db){
 
 // ===== 展示结果 =====
 function showResult(sz,inputs,db){
+  if(age==='child'&&sz>=160){var ad=D.adult;db=Object.assign({},db,{data:Object.assign({},db.data,ad.data),sizes:CHILD_SIZES.concat(ADULT_SIZES),bodyRef:Object.assign({},db.bodyRef,ad.bodyRef)})}
   document.getElementById('rSize').textContent=sz;
   document.getElementById('rLabel').textContent=age==='child'?'推荐儿童尺码':'推荐成人尺码';
   var tag=document.getElementById('rTag');
