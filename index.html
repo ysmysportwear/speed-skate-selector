@@ -1328,10 +1328,13 @@ async function doCreateOrder(){
     status:'unpaid'
   };
 
-  // 面料/工艺/备注
+  // 面料/工艺/备注/收货 — 兜底写入items[0]._meta，确保表列缺失时也不丢
   try{if(order.fabric) orderRow.fabric=order.fabric}catch(e){}
   try{if(order.stitch) orderRow.stitch=order.stitch}catch(e){}
   try{if(order.remark) orderRow.remark=order.remark}catch(e){}
+  if(orderRow.items&&orderRow.items.length>0){
+    orderRow.items[0]._meta={fabric:order.fabric||'',stitch:order.stitch||'',remark:order.remark||'',shipName:order.shipName||'',shipPhone:order.shipPhone||'',shipAddr:order.shipAddr||''};
+  }
 
   // 尝试添加可选字段
   try{orderRow.shipping_name=order.shipName}catch(e){}
@@ -2618,10 +2621,10 @@ async function viewOrderDetail(orderId){
     _currentOrderData=o;
 
     var items=o.items||[];
-    // 从items回填缺失的订单级字段（兼容旧订单）
-    if(!o.fabric&&items.length>0){var f0=items.find(function(it){return it.fabric});if(f0) o.fabric=f0.fabric}
-    if(!o.stitch&&items.length>0){var s0=items.find(function(it){return it.stitch});if(s0) o.stitch=s0.stitch}
-    if(!o.shipping_name&&items.length>0){var sh=items.find(function(it){return it._ship});if(sh){o.shipping_name=sh._ship.name||'';o.shipping_phone=sh._ship.phone||'';o.shipping_address=sh._ship.addr||''}}
+    var m=items.length>0?items[0]._meta:null;
+    if(!o.fabric){o.fabric=m?m.fabric:'';if(!o.fabric){var fi=items.find(function(it){return it.fabric});if(fi) o.fabric=fi.fabric}}
+    if(!o.stitch){o.stitch=m?m.stitch:'';if(!o.stitch){var si=items.find(function(it){return it.stitch});if(si) o.stitch=si.stitch}}
+    if(!o.shipping_name){o.shipping_name=m?m.shipName:'';o.shipping_phone=m?m.shipPhone:'';o.shipping_address=m?m.shipAddr:'';if(!o.shipping_name){var sh=items.find(function(it){return it._ship});if(sh){o.shipping_name=sh._ship.name||'';o.shipping_phone=sh._ship.phone||'';o.shipping_address=sh._ship.addr||''}}}
     var el=document.getElementById('orderDetailContent');
     var html='';
 
