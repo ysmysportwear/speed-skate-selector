@@ -2943,7 +2943,7 @@ async function editTeam(code, name, phone){
   if(nn===null)return;
   var np=prompt('Edit phone:',phone);
   if(np===null)return;
-  var r=await sb.from('team_profiles').update({coach_name:nn,phone:np}).eq('team_code',code);
+  var r=await sb.from('team_profiles').update({coach_name:nn,phone:np}).eq('team_code',code).eq('system','skate');
   if(r.error){showToast('Save failed');return}
   showToast('Updated: '+code);
   loadAdminTeams();
