@@ -1,4 +1,4 @@
-﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -701,7 +701,7 @@ try{
 var SHRINK=0.97;
 
 var CHILD_SIZES=[110,120,130,140,150,155];
-var ADULT_SIZES=[160,165,170,175,180,185,190];
+var ADULT_SIZES=[160,165,170,175,180,185,195];
 
 var D={
   child:{
@@ -2661,7 +2661,7 @@ async function viewOrderDetail(orderId){
 
     // 按儿童款/成人款+尺码分组
     var childSizes=[110,120,130,140,150,155];
-    var adultSizes=['XS','S','M','L','XL','2XL','3XL','5XL'];
+    var adultSizes=[160,165,170,175,180,185,195];
     var childItems=items.filter(function(it){return it.age==='child'});
     var adultItems=items.filter(function(it){return it.age!=='child'});
 
@@ -2683,7 +2683,7 @@ async function viewOrderDetail(orderId){
     // 成人款尺码统计
     if(adultItems.length>0){
       html+='<div style="margin-top:10px;margin-bottom:8px"><b>成人款</b></div>';
-      html+='<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px;text-align:center;margin-bottom:8px">';
+      html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;margin-bottom:8px">';
       adultSizes.forEach(function(sz){
         var count=adultItems.filter(function(it){return it.size===sz}).length;
         html+='<div style="padding:6px 2px;background:'+(count>0?'var(--accent-bg)':'var(--bg)')+';border-radius:6px;font-size:11px">';
@@ -2737,7 +2737,7 @@ function exportCurrentOrder(){
 
   // 尺码映射（儿童码用数字，成人码用字母）
   var childSizes=[110,120,130,140,150,155];
-  var adultSizes=['XS','S','M','L','XL','2XL','3XL','5XL'];
+  var adultSizes=[160,165,170,175,180,185,195];
   var allSizes=childSizes.concat(adultSizes);
   var childItems=items.filter(function(it){return it.age==='child'});
   var adultItems=items.filter(function(it){return it.age!=='child'});
