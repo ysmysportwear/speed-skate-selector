@@ -719,7 +719,7 @@ try{
 var SHRINK=0.97;
 
 var CHILD_SIZES=[110,120,130,140,150,155];
-var ADULT_SIZES=[160,165,170,175,180,185,195];
+var ADULT_SIZES=[160,165,170,175,180,185,190];
 
 var D={
   child:{
@@ -2768,7 +2768,7 @@ async function viewOrderDetail(orderId){
 
     // 按儿童款/成人款+尺码分组
     var childSizes=[110,120,130,140,150,155];
-    var adultSizes=[160,165,170,175,180,185,195];
+    var adultSizes=[160,165,170,175,180,185,190];
     var childItems=items.filter(function(it){return it.age==='child'});
     var adultItems=items.filter(function(it){return it.age!=='child'});
 
@@ -2844,7 +2844,7 @@ function exportCurrentOrder(){
 
   // 尺码映射（儿童码用数字，成人码用字母）
   var childSizes=[110,120,130,140,150,155];
-  var adultSizes=[160,165,170,175,180,185,195];
+  var adultSizes=[160,165,170,175,180,185,190];
   var allSizes=childSizes.concat(adultSizes);
   var childItems=items.filter(function(it){return it.age==='child'});
   var adultItems=items.filter(function(it){return it.age!=='child'});
