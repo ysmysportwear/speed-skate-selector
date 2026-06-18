@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -383,10 +383,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       <input type="text" id="iName2" placeholder="如：张小明">
     </div>
     <div class="fg">
-      <label>身高 cm <span class="req">*</span></label>
-      <input type="number" id="iHt" placeholder="儿童110~155 / 成人160~190">
-    </div>
-    <div class="fg">
       <label>胸围 cm <span class="req">*</span> <span class="hint">（整围，即量一圈的数值）</span></label>
       <input type="number" id="iC" placeholder="儿童50~80 / 成人70~120">
     </div>
@@ -467,7 +463,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <div id="coachContent"></div>
   </div>
 
-  <div class="foot">团队队服定制 · 山东威海 · 速滑服专业定制</div>
+  <div class="foot">晨哥团队队服定制 · 山东威海 · 速滑服专业定制</div>
 </div>
 
 <!-- 尺码对照弹窗 -->
@@ -518,8 +514,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
         <input type="text" id="newTeamCode" placeholder="如：A3B9K2" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;text-align:center">
       </div>
       <div class="fg">
-        <label>教练姓名 <span class="req">*</span></label>
-        <input type="text" id="newCoachName" placeholder="如：王教练">
+        <label>晨哥姓名 <span class="req">*</span></label>
+        <input type="text" id="newCoachName" placeholder="如：晨哥">
       </div>
       <div class="fg">
         <label>手机号 <span class="hint">（选填）</span></label>
@@ -741,47 +737,8 @@ var D={
   }
 };
 
-// ===== 单价 & 权益体系 =====
-var UNIT_PRICE=0; // 价格由教练手动填写，不再自动计算
-
-var BENEFIT_LEVELS=[
-  {minAmount:0,   label:'基础',  freeShip:false,iceTowel:0, discount:1.0, badge:'bronze'},
-  {minAmount:20,  label:'银卡',  freeShip:true, iceTowel:5, discount:1.0, badge:'silver'},
-  {minAmount:30,  label:'金卡',  freeShip:true, iceTowel:10,discount:1.0, badge:'gold'},
-  {minAmount:40,  label:'铂金',  freeShip:true, iceTowel:20,discount:1.0, badge:'platinum'},
-  {minAmount:50,  label:'钻石',  freeShip:true, iceTowel:20,discount:1.0,freeSample:true, badge:'diamond'}
-];
-
-function getBenefitLevel(amount){
-  var level=BENEFIT_LEVELS[0];
-  for(var i=0;i<BENEFIT_LEVELS.length;i++){
-    if(amount>=BENEFIT_LEVELS[i].minAmount) level=BENEFIT_LEVELS[i];
-  }
-  return level;
-}
-
-function getBenefitText(level){
-  var perks=[];
-  if(level.freeShip) perks.push('包邮');
-  if(level.iceTowel>0) perks.push('赠运动冰巾×'+level.iceTowel);
-  if(level.freeSample) perks.push('免费设计打样样衣×1');
-  if(level.discount<1) perks.push('全场'+(level.discount*100).toFixed(0)+'%');
-  return perks.length>0?perks.join(' + '):'暂无权益';
-}
-
-function getNextBenefitHint(amount){
-  for(var i=0;i<BENEFIT_LEVELS.length;i++){
-    if(amount<BENEFIT_LEVELS[i].minAmount){
-      var diff=BENEFIT_LEVELS[i].minAmount-amount;
-      return '再满'+diff+'件可享「'+BENEFIT_LEVELS[i].label+'」'+getBenefitText(BENEFIT_LEVELS[i]);
-    }
-  }
-  return '已达最高权益等级';
-}
-
-// 兼容旧引用
-var DISCOUNT_LEVELS=BENEFIT_LEVELS;
-function getDiscountLevel(totalOrders){return BENEFIT_LEVELS[0]}
+// ===== 单价 =====
+var UNIT_PRICE=0; // 价格由晨哥手动填写，不再自动计算
 
 // ===== 状态 =====
 var age='child', mode='easy', fit='tight', addFat=false;
@@ -865,7 +822,6 @@ function renderTeamSection(){
   if(teamCode){
     var totalOrders=teamProfile?teamProfile.total_orders:0;
     var totalAmount=teamProfile?parseFloat(teamProfile.total_amount||0):0;
-    var benefit=getBenefitLevel(totalAmount);
     var coachName=teamProfile&&teamProfile.coach_name?teamProfile.coach_name:'';
 
     // 当前购物车件数
@@ -885,19 +841,8 @@ function renderTeamSection(){
       +'<div class="tb-stats">'
       +'<div class="tb-stat"><div class="tb-stat-val">'+totalOrders+'</div><div class="tb-stat-lbl">累计下单</div></div>'
       +'<div class="tb-stat"><div class="tb-stat-val">'+totalAmount.toFixed(0)+'件</div><div class="tb-stat-lbl">累计件数</div></div>'
-      +'<div class="tb-stat"><div class="tb-stat-val" style="font-size:11px">'+(benefit.minAmount>0?benefit.label+' · '+getBenefitText(benefit):'暂无权益')+'</div><div class="tb-stat-lbl">当前权益</div></div>'
       +'</div>'
-      +(benefit.minAmount>0?'<div class="tb-discount">🏆 '+benefit.label+'客户 · '+getBenefitText(benefit)+'</div>':'')
       +'</div>';
-
-    // 购物车权益提示（在banner下方）
-    if(cartData.length>0&&cartCount<5000){
-      var hint=getNextBenefitHint(cartCount);
-      el.innerHTML+='<div style="background:var(--warn-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--warn);text-align:center;line-height:1.6">💡 当前'+cartCount+'件 · '+hint+'</div>';
-    }else if(cartData.length>0&&cartCount>=5000){
-      var cartBenefit2=getBenefitLevel(cartCount);
-      el.innerHTML+='<div style="background:var(--accent-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--accent);text-align:center;line-height:1.6">🏆 当前'+cartCount+'件 · 已享最高权益：'+getBenefitText(cartBenefit2)+'</div>';
-    }
 
     // 待确认订单提示
     el.innerHTML+='<div id="unpaidHint" style="display:none;background:var(--danger-bg);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-size:11px;color:var(--danger);text-align:center;line-height:1.6"></div>';
@@ -917,7 +862,7 @@ function renderTeamSection(){
     }
     el.innerHTML='<div class="team-input-card">'
       +'<h3>🏷️ 输入团队码</h3>'
-      +'<p>教练创建团队码后分享给家长，数据自动同步<br>累积消费享专属权益</p>'
+      +'<p>教练创建团队码后分享给家长，数据自动同步</p>'
       +(!sb||!sbConnected?'<div style="background:var(--warn-bg);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--warn);text-align:center">⚠️ 云端未连接，团队码功能暂不可用<br>请检查网络后刷新页面</div>':'')
       +'<div class="team-input-row">'
       +'<input type="text" id="teamInput" placeholder="如：A3B9K2" maxlength="6" style="text-transform:uppercase"'
@@ -1042,7 +987,7 @@ async function submitCreateTeam(){
   if(code==='000000'){showToast('⚠️ 000000 为零售专用码，不可创建');document.getElementById('newTeamCode').focus();return}
   if(code.length!==6){showToast('⚠️ 团队码必须是6位，您输入了'+code.length+'位');document.getElementById('newTeamCode').focus();return}
   if(!/^[A-Z0-9]{6}$/.test(code)){showToast('⚠️ 团队码只能包含字母和数字');document.getElementById('newTeamCode').focus();return}
-  if(!coachName){showToast('⚠️ 请输入教练姓名');document.getElementById('newCoachName').focus();return}
+  if(!coachName){showToast('⚠️ 请输入晨哥姓名');document.getElementById('newCoachName').focus();return}
 
   // 防止重复点击
   if(btn){btn.disabled=true;btn.textContent='创建中...';}
@@ -1300,14 +1245,12 @@ function confirmOrderConfig(){
   var snapshotItems=cartData.map(function(it){
     return {name:it.name,detail:it.detail,size:it.sz,age:it.age,addFat:it.addFat,scheme:it.scheme,custom:it.custom};
   });
-  var snapshotBenefit=getBenefitLevel(cartCount);
-
   var fabric=fabrics.find(function(f){return f.id===currentFabric});
   var fabricName=fabric?fabric.name.replace(/\n/g,''):'';
   var stitch=stitchOptions.find(function(s){return s.id===currentStitch});
   var stitchName=stitch?stitch.name:'';
 
-  window._pendingOrder={items:snapshotItems,count:cartCount,benefit:snapshotBenefit,
+  window._pendingOrder={items:snapshotItems,count:cartCount,
     shipName:ship.shipName,shipPhone:ship.shipPhone,shipAddr:ship.shipAddr,
     fabric:fabricName,stitch:stitchName,remark:remark};
 
@@ -1325,9 +1268,6 @@ function confirmOrderConfig(){
     +'<div style="margin:6px 0">'+snapshotHtml+'</div>';
   if(configInfo){
     confirmMsg+='<div style="margin:6px 0;padding:8px;background:var(--bg);border-radius:8px;font-size:12px;line-height:1.8">'+configInfo+'</div>';
-  }
-  if(snapshotBenefit.minAmount>0){
-    confirmMsg+='<br>🎉 本单权益：'+getBenefitText(snapshotBenefit)+'<br>';
   }
   confirmMsg+='<br>收货人：'+ship.shipName+' '+ship.shipPhone+'<br>'
     +'收货地址：'+ship.shipAddr+'<br><br>'
@@ -1470,7 +1410,7 @@ async function doCreateOrder(){
   // 步骤4: 显示成功弹窗
   showOrderProgress(3,'下单成功！');
 
-  var coachName=teamProfile?teamProfile.coach_name:'';
+  var coachName=teamProfile?teamProfile.coach_name:'晨哥';
   var coachPhone2=teamProfile&&teamProfile.phone?teamProfile.phone:'';
   var detailHtml=order.items.map(function(it){return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>'+it.name+'</span><span style="color:var(--text3)">'+it.size+'码</span></div>';}).join('');
 
@@ -1478,7 +1418,7 @@ async function doCreateOrder(){
     '<div style="background:var(--accent-bg);border-radius:10px;padding:10px 14px;margin-bottom:10px">'
     +'📋 订单编号：<b style="font-size:16px">'+orderNo+'</b><br>'
     +'📦 共 <b style="font-size:18px;color:var(--accent)">'+order.count+'</b> 件'
-    +(order.benefit.minAmount>0?' · 🎉 '+getBenefitText(order.benefit):'')
+
     +'</div>'
     +'<div style="text-align:left;margin-bottom:10px;font-size:13px">'+detailHtml+'</div>'
     +'<div style="text-align:left;font-size:12px;color:var(--text2);line-height:1.8">'
@@ -2174,13 +2114,8 @@ function renderCoachView(){
     return;
   }
 
-  // 折扣信息
-  var discountInfo=getDiscountLevel(teamProfile?teamProfile.total_orders:0);
-
-  // 当前订单件数 & 权益
+  // 当前订单件数
   var cartCount=cartData.length;
-  var cartBenefit=getBenefitLevel(cartCount);
-
   // 名单列表
   var html='<div class="coach-list">';
   cartData.forEach(function(item,i){
@@ -2218,23 +2153,6 @@ function renderCoachView(){
 
   html+='<div class="coach-count">共 '+cartData.length+' 人'
     +' <span class="sync-indicator"><span class="sync-dot '+(sb&&teamCode?'':'offline')+'"></span> '+(sb&&teamCode?'已同步':'未同步')+'</span></div>';
-
-  // 件数 & 权益展示
-  html+='<div style="background:var(--card);border-radius:12px;padding:14px;margin-top:12px;border:1px solid var(--border)">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-    +'<span style="font-size:13px;color:var(--text2)">商品件数</span>'
-    +'<span style="font-size:14px;font-weight:600">'+cartData.length+'件</span>'
-    +'</div>';
-  // 权益信息
-  if(cartBenefit.minAmount>0){
-    html+='<div style="margin-top:8px;padding:8px 12px;background:var(--accent-bg);border-radius:8px;font-size:11px;color:var(--accent);line-height:1.6">'
-      +'🎉 本单权益：'+getBenefitText(cartBenefit)+'</div>';
-  }else if(cartCount<20&&cartCount>0){
-    var diff=20-cartCount;
-    html+='<div style="margin-top:8px;padding:8px 12px;background:var(--warn-bg);border-radius:8px;font-size:11px;color:var(--warn);line-height:1.6">'
-      +'💡 再满'+diff+'件即可享「银卡」权益：包邮 + 赠运动冰巾×5</div>';
-  }
-  html+='</div>';
 
   html+='<div class="coach-actions">'
     +'<button class="btn-copy" onclick="copySummary()">📋 复制汇总</button>'
@@ -2290,7 +2208,7 @@ function copySummary(){
   if(cartData.length===0){showToast('选购清单为空');return}
   var text='📋 速滑服尺码汇总\n';
   text+='团队码：'+teamCode+'\n';
-  if(teamProfile&&teamProfile.coach_name) text+='教练：'+teamProfile.coach_name+'\n';
+  if(teamProfile&&teamProfile.coach_name) text+='晨哥：'+teamProfile.coach_name+'\n';
   text+='款式：'+(age==='child'?'儿童款':'成人款')+(addFat?' | 加肥版(+¥20)':'')+'\n';
   text+='合计：'+cartData.length+'件\n';
   text+='明细：\n';
@@ -2329,8 +2247,6 @@ function exportExcel(){
     if(c>0) csv+=s+'码,'+c+'件\n';
   });
   csv+='合计,,'+cartData.length+'件\n';
-  var cartBenefit=getBenefitLevel(cartData.length);
-  if(cartBenefit.minAmount>0) csv+='权益,,'+getBenefitText(cartBenefit)+'\n';
 
   var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   var url=URL.createObjectURL(blob);
@@ -2394,21 +2310,9 @@ function closeModal(){
 
 // ===== 管理员功能 =====
 var isAdmin=false;
-// SHA-256 哈希函数（浏览器原生 Web Crypto）
-async function sha256(text){
-  var enc=new TextEncoder().encode(text);
-  var buf=await crypto.subtle.digest('SHA-256',enc);
-  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
-}
-// HTML 转义函数（防 XSS）
-function escHtml(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-async function adminLogin(){
+function adminLogin(){
   var pw=prompt('请输入管理员密码');
-  if(!pw){ return; }
-  var hash=await sha256(pw);
-  if(hash==='cce4ceabd9b0145535a1666c6e0abf2332b4804914486ed90c63ec641fd8a7f2'){
+  if(pw==='CG5166'){
     isAdmin=true;
     document.getElementById('adminBar').style.display='block';
     document.getElementById('adminBtn').style.opacity='1';
@@ -2417,7 +2321,7 @@ async function adminLogin(){
     loadAdminTeams();
     document.getElementById('adminModal').classList.add('show');
     showToast('🔑 管理员已登录');
-  }else{
+  }else if(pw!==null){
     showToast('❌ 密码错误');
   }
 }
@@ -2436,14 +2340,14 @@ async function loadAdminTeams(){
   el.innerHTML='<div style="text-align:center;color:var(--text3)">⏳ 加载中...</div>';
   if(!sb){el.innerHTML='<div style="text-align:center;color:var(--danger)">未连接云端</div>';return}
   try{
-    var resp=await sb.from('team_profiles').select('*').eq('system','skate').order('created_at',{ascending:false});
+    var resp=await sb.from('team_profiles').select('*').order('created_at',{ascending:false});
     if(resp.error){el.innerHTML='<div style="text-align:center;color:var(--danger)">加载失败</div>';return}
     var teams=resp.data||[];
     var html='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">共 '+teams.length+' 个团队</div>';
     teams.forEach(function(t){
       html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px">';
-      html+='<span style=cursor:pointer onclick=editTeam("'+t.team_code+'","'+(t.coach_name||'')+'","'+(t.phone||'')+'")><b>'+escHtml(t.team_code)+'</b> '+escHtml(t.coach_name||'')+' ?</span>';
-      html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+(t.total_orders||0)+'单 <span style=cursor:pointer;color:var(--danger);font-weight:700;margin-left:6px onclick=deleteTeam("'+t.team_code+'")>X</span></span>';
+      html+='<span><b>'+t.team_code+'</b> '+ (t.coach_name||'') +'</span>';
+      html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+ (t.total_orders||0) +'单</span>';
       html+='</div>';
     });
     el.innerHTML=html;
@@ -2581,7 +2485,7 @@ async function loadOrders(){
 }
 
 async function confirmPayment(orderId,totalItems){
-  // 弹出输入框填写成交价格
+  // 弹出输入框让晨哥填写成交价格
   var inputHtml='<div style="text-align:center">'
     +'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">本单共 <b>'+totalItems+'</b> 件，请输入最终成交价格</div>'
     +'<input type="number" id="manualPriceInput" placeholder="如：3600" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:18px;text-align:center;outline:none" oninput="this.style.borderColor=this.value?\'var(--accent)\':\'var(--border)\'">'
@@ -2617,8 +2521,7 @@ async function confirmPayment(orderId,totalItems){
         renderTeamSection();
         await loadOrders();
 
-        var newBenefit=getBenefitLevel(newAmount);
-        showToast('✅ 收款确认！累计¥'+newAmount.toFixed(0)+' · '+newBenefit.label+'客户');
+        showToast('✅ 收款确认！累计¥'+newAmount.toFixed(0));
       }catch(e){
         showToast('⚠️ 操作失败，请重试');
       }
@@ -2865,7 +2768,7 @@ function exportCurrentOrder(){
   row13.push('');
   data.push(row13);
 
-  // Row 14: 合计（价格留空，手动填）
+  // Row 14: 合计（价格留空，晨哥手动填）
   data.push(['','合计','','','','','','','','','','','']);
 
   // 创建工作簿
@@ -2924,27 +2827,7 @@ window.addEventListener('unhandledrejection',function(e){
   _errEl.style.display='block';
   _errEl.textContent='❌ Promise: '+(e.reason&&e.reason.message||e.reason);
 });
-
-async function deleteTeam(code){
-  if(!confirm('Delete team '+code+' and all related data?'))return;
-  try{
-    await sb.from('cart_items').delete().eq('team_code',code);
-    await sb.from('orders').delete().eq('team_code',code);
-    await sb.from('team_profiles').delete().eq('team_code',code).eq('system','skate');
-    showToast('Deleted: '+code);
-    loadAdminTeams();
-  }catch(e){showToast('Delete failed')}
-}
-async function editTeam(code, name, phone){
-  var nn=prompt('Edit coach name:',name);
-  if(nn===null)return;
-  var np=prompt('Edit phone:',phone);
-  if(np===null)return;
-  var r=await sb.from('team_profiles').update({coach_name:nn,phone:np}).eq('team_code',code).eq('system','skate');
-  if(r.error){showToast('Save failed');return}
-  showToast('Updated: '+code);
-  loadAdminTeams();
-}</script>
+</script>
 <!-- 管理员面板 -->
 <div class="modal-bg" id="adminModal" onclick="if(event.target===this)document.getElementById('adminModal').classList.remove('show')">
   <div class="modal">
