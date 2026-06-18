@@ -2411,7 +2411,7 @@ async function adminLogin(){
   var pw=prompt('请输入管理员密码');
   if(!pw){ return; }
   var hash=await sha256(pw);
-  if(hash==='d99e79ccafe31ab1e6117774f424ef9b822098f37c1441c683797ea67bb88b33'){
+  if(hash==='cce4ceabd9b0145535a1666c6e0abf2332b4804914486ed90c63ec641fd8a7f2'){
     isAdmin=true;
     document.getElementById('adminBar').style.display='block';
     document.getElementById('adminBtn').style.opacity='1';
