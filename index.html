@@ -1351,42 +1351,60 @@ async function doCreateOrder(){
     showOrderProgress(1,'写入失败，尝试精简模式...');
     console.warn('[doCreateOrder] full insert failed:',resp.error.message);
 
-    // 尝试1: 最小字段（不带shipping/order_no等可选字段）
-    var minRow={team_code:teamCode,items:order.items,total_items:order.count,total_amount:0,status:'unpaid'};
+    // 构建扩展字段，回退路径也带上
+    var ext={};
+    try{if(order.fabric) ext.fabric=order.fabric}catch(e){}
+    try{if(order.stitch) ext.stitch=order.stitch}catch(e){}
+    try{if(order.remark) ext.remark=order.remark}catch(e){}
+    try{if(order.shipName) ext.shipping_name=order.shipName}catch(e){}
+    try{if(order.shipPhone) ext.shipping_phone=order.shipPhone}catch(e){}
+    try{if(order.shipAddr) ext.shipping_address=order.shipAddr}catch(e){}
+
+    // 尝试1: 带扩展字段（去掉 order_no）
+    var minRow=Object.assign({team_code:teamCode,items:order.items,total_items:order.count,total_amount:0,status:'unpaid'},ext);
     var resp2=await sb.from('orders').insert(minRow).select();
     if(!resp2.error&&resp2.data&&resp2.data.length>0){
       resp=resp2;
-      console.log('[doCreateOrder] minimal insert OK');
+      console.log('[doCreateOrder] extended insert OK');
     }else if(resp2.error){
-      console.warn('[doCreateOrder] minimal also failed:',resp2.error.message);
-      // 尝试2: items用JSON.stringify
-      var strRow={team_code:teamCode,items:JSON.stringify(order.items),total_items:order.count,total_amount:0,status:'unpaid'};
-      var resp3=await sb.from('orders').insert(strRow).select();
+      console.warn('[doCreateOrder] extended failed:',resp2.error.message);
+      // 尝试2: 纯最小（无扩展）
+      var bareRow={team_code:teamCode,items:order.items,total_items:order.count,total_amount:0,status:'unpaid'};
+      var resp3=await sb.from('orders').insert(bareRow).select();
       if(!resp3.error&&resp3.data&&resp3.data.length>0){
         resp=resp3;
-        console.log('[doCreateOrder] stringified items insert OK');
+        console.log('[doCreateOrder] bare insert OK');
       }else if(resp3.error){
-        // 尝试3: 完全不带items
-        var noItemsRow={team_code:teamCode,total_items:order.count,total_amount:0,status:'unpaid'};
-        var resp4=await sb.from('orders').insert(noItemsRow).select();
+        console.warn('[doCreateOrder] bare failed:',resp3.error.message);
+        // 尝试3: items stringify + 扩展
+        var strRow=Object.assign({team_code:teamCode,items:JSON.stringify(order.items),total_items:order.count,total_amount:0,status:'unpaid'},ext);
+        var resp4=await sb.from('orders').insert(strRow).select();
         if(!resp4.error&&resp4.data&&resp4.data.length>0){
           resp=resp4;
-          console.log('[doCreateOrder] no-items insert OK');
-        }else{
-          hideOrderProgress();
-          showToast('❌ 下单失败：'+resp4.error.message);
-          // 显示详细错误到诊断面板
-          var errHtml='<div style="text-align:left;font-size:12px;line-height:1.8;background:#fff5f5;padding:12px;border-radius:8px">'
-            +'<div style="font-weight:700;color:#c00;margin-bottom:8px">❌ 下单失败详情</div>'
-            +'<div>完整插入: '+resp.error.message+'</div>'
-            +'<div>精简插入: '+resp2.error.message+'</div>'
-            +'<div>Stringify: '+(resp3.error?resp3.error.message:'未知错误')+'</div>'
-            +'<div>无Items: '+(resp4.error?resp4.error.message:'未知错误')+'</div>'
-            +'<div style="margin-top:8px;color:var(--text3)">请截图发给开发者排查</div>'
-            +'</div>';
-          document.getElementById('orderSuccessDetail').innerHTML=errHtml;
-          document.getElementById('orderSuccessModal').classList.add('show');
-          return;
+          console.log('[doCreateOrder] stringified insert OK');
+        }else if(resp4.error){
+          // 尝试4: 无items + 扩展
+          var noItemsRow=Object.assign({team_code:teamCode,total_items:order.count,total_amount:0,status:'unpaid'},ext);
+          var resp5=await sb.from('orders').insert(noItemsRow).select();
+          if(!resp5.error&&resp5.data&&resp5.data.length>0){
+            resp=resp5;
+            console.log('[doCreateOrder] no-items insert OK');
+          }else{
+            hideOrderProgress();
+            showToast('❌ 下单失败：'+resp5.error.message);
+            var errHtml='<div style="text-align:left;font-size:12px;line-height:1.8;background:#fff5f5;padding:12px;border-radius:8px">'
+              +'<div style="font-weight:700;color:#c00;margin-bottom:8px">❌ 下单失败详情</div>'
+              +'<div>完整插入: '+resp.error.message+'</div>'
+              +'<div>扩展插入: '+resp2.error.message+'</div>'
+              +'<div>纯最小: '+(resp3.error?resp3.error.message:'未知错误')+'</div>'
+              +'<div>Stringify: '+(resp4.error?resp4.error.message:'未知错误')+'</div>'
+              +'<div>无Items: '+(resp5.error?resp5.error.message:'未知错误')+'</div>'
+              +'<div style="margin-top:8px;color:var(--text3)">请截图发给开发者排查</div>'
+              +'</div>';
+            document.getElementById('orderSuccessDetail').innerHTML=errHtml;
+            document.getElementById('orderSuccessModal').classList.add('show');
+            return;
+          }
         }
       }
     }
