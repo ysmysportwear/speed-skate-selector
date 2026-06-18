@@ -2446,7 +2446,7 @@ async function loadAdminTeams(){
     teams.forEach(function(t){
       html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px">';
       html+='<span><b>'+escHtml(t.team_code)+'</b> '+escHtml(t.coach_name||'')+'</span>';
-      html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+ (t.total_orders||0) +'单</span>';
+      html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+(t.total_orders||0)+'单 <span style=cursor:pointer;color:var(--danger);font-weight:700;margin-left:6px onclick=deleteTeam("'+t.team_code+'")>X</span></span>';
       html+='</div>';
     });
     el.innerHTML=html;
@@ -2927,6 +2927,17 @@ window.addEventListener('unhandledrejection',function(e){
   _errEl.style.display='block';
   _errEl.textContent='❌ Promise: '+(e.reason&&e.reason.message||e.reason);
 });
+
+async function deleteTeam(code){
+  if(!confirm('Delete team '+code+' and all related data?'))return;
+  try{
+    await sb.from('cart_items').delete().eq('team_code',code);
+    await sb.from('orders').delete().eq('team_code',code);
+    await sb.from('team_profiles').delete().eq('team_code',code);
+    showToast('Deleted: '+code);
+    loadAdminTeams();
+  }catch(e){showToast('Delete failed')}
+}
 </script>
 <!-- 管理员面板 -->
 <div class="modal-bg" id="adminModal" onclick="if(event.target===this)document.getElementById('adminModal').classList.remove('show')">
