@@ -2445,7 +2445,7 @@ async function loadAdminTeams(){
     var html='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">共 '+teams.length+' 个团队</div>';
     teams.forEach(function(t){
       html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px">';
-      html+='<span><b>'+escHtml(t.team_code)+'</b> '+escHtml(t.coach_name||'')+'</span>';
+      html+='<span style=cursor:pointer onclick=editTeam("'+t.team_code+'","'+(t.coach_name||'')+'","'+(t.phone||'')+'")><b>'+escHtml(t.team_code)+'</b> '+escHtml(t.coach_name||'')+' ?</span>';
       html+='<span style="color:var(--text3);font-size:11px">📞'+ (t.phone||'') +' 📦'+(t.total_orders||0)+'单 <span style=cursor:pointer;color:var(--danger);font-weight:700;margin-left:6px onclick=deleteTeam("'+t.team_code+'")>X</span></span>';
       html+='</div>';
     });
@@ -2938,7 +2938,16 @@ async function deleteTeam(code){
     loadAdminTeams();
   }catch(e){showToast('Delete failed')}
 }
-</script>
+async function editTeam(code, name, phone){
+  var nn=prompt('Edit coach name:',name);
+  if(nn===null)return;
+  var np=prompt('Edit phone:',phone);
+  if(np===null)return;
+  var r=await sb.from('team_profiles').update({coach_name:nn,phone:np}).eq('team_code',code);
+  if(r.error){showToast('Save failed');return}
+  showToast('Updated: '+code);
+  loadAdminTeams();
+}</script>
 <!-- 管理员面板 -->
 <div class="modal-bg" id="adminModal" onclick="if(event.target===this)document.getElementById('adminModal').classList.remove('show')">
   <div class="modal">
