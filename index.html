@@ -2721,7 +2721,7 @@ function exportCurrentOrder(){
   data.push(['订单信息：','','','','','','','','','','','','']);
 
   // Row 7: 面料
-  var fabric='梭织+防水透气膜+数码印花';
+  var fabric=currentFabric?fabrics.find(function(f){return f.id===currentFabric}).name:'';
   data.push(['','','','','','面料：',fabric,'','','','','','']);
 
   // Row 8: 备注
