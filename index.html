@@ -130,6 +130,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .submit{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s;letter-spacing:1px}
 .submit:active{transform:scale(.98);opacity:.9}
 
+/* 数量选择器 */
+.qty-row{display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0}
+.qty-row label{font-size:13px;font-weight:600;color:var(--text2);margin-right:14px}
+.qty-btn{width:38px;height:38px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);font-size:20px;font-weight:700;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:all .1s}
+.qty-btn:active{background:var(--bg);border-color:var(--accent)}
+.qty-num{width:52px;height:38px;text-align:center;font-size:18px;font-weight:700;border:1.5px solid var(--border);border-left:none;border-right:none;background:var(--bg);color:var(--text);-moz-appearance:textfield}
+.qty-num::-webkit-outer-spin-button,.qty-num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
 /* Result */
 .res{display:none;margin-top:18px;animation:slideUp .3s ease}
 .res.show{display:block}
@@ -328,16 +336,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       <div class="m-title">量三围数据</div>
       <div class="m-sub">精准匹配 合身推荐</div>
     </div>
+    <div class="mode-btn" data-v="manual">
+      <div class="m-icon">✋</div>
+      <div class="m-title">自己选号</div>
+      <div class="m-sub">直接选码 · 加入清单</div>
+    </div>
     <div class="mode-btn" data-v="coach">
       <div class="m-icon">📋</div>
       <div class="m-title">选购清单</div>
       <div class="m-sub">查看汇总 · 下单</div>
       <div class="badge" id="coachBadge">0</div>
-    </div>
-    <div class="mode-btn" data-v="manual">
-      <div class="m-icon">✋</div>
-      <div class="m-title">自己选号</div>
-      <div class="m-sub">直接选码 · 加入清单</div>
     </div>
   </div>
 
@@ -356,7 +364,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <div style="display:flex;gap:6px;margin-top:4px;justify-content:center">
       <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
     </div>
-    <button class="submit" onclick="confirmManualSize()" style="margin-top:12px">✅ 确认尺码，加入选购清单</button>
+    <div class="qty-row">
+      <label>数量</label>
+      <button class="qty-btn" onclick="changeQty('m',-1)">−</button>
+      <input type="number" class="qty-num" id="qtyM" value="1" min="1" max="99" oninput="clampQty('m')">
+      <button class="qty-btn" onclick="changeQty('m',1)">+</button>
+    </div>
+    <button class="submit" onclick="confirmManualSize()" style="margin-top:0">✅ 确认尺码，加入选购清单</button>
   </div>
 
   <!-- 方式1：身高体重 -->
@@ -396,6 +410,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
         <span class="fo-check">✓</span>
       </div>
     </div>
+    <div class="qty-row">
+      <label>数量</label>
+      <button class="qty-btn" onclick="changeQty('e',-1)">−</button>
+      <input type="number" class="qty-num" id="qtyE" value="1" min="1" max="99" oninput="clampQty('e')">
+      <button class="qty-btn" onclick="changeQty('e',1)">+</button>
+    </div>
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
     <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
       <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
@@ -407,6 +427,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <div class="fg">
       <label>队员姓名 <span class="req">*</span> <span class="hint">（必填，重复姓名无法添加）</span></label>
       <input type="text" id="iName2" placeholder="如：张小明">
+    </div>
+    <div class="fg">
+      <label>身高 cm <span class="req">*</span> <span class="hint">（必填）</span></label>
+      <input type="number" id="iH2" placeholder="如：170">
     </div>
     <div class="fg">
       <label>胸围 cm <span class="req">*</span> <span class="hint">（整围，即量一圈的数值）</span></label>
@@ -428,7 +452,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
         <div class="fo-left">
           <span class="fo-badge">👍 推荐</span>
           <span class="fo-name">标准款</span>
-          <span class="fo-desc">竞技贴身剪裁，不加价</span>
+          <span class="fo-desc">按身高体重正常推荐尺码，不加价</span>
         </div>
         <span class="fo-check">✓</span>
       </div>
@@ -436,10 +460,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
         <div class="fo-left">
           <span class="fo-badge upgrade">💰 +¥20</span>
           <span class="fo-name">加肥定制版</span>
-          <span class="fo-desc">三围尺寸放大，额外付费</span>
+          <span class="fo-desc">同码数加大胸围/臀围/大腿围，额外付费</span>
         </div>
         <span class="fo-check">✓</span>
       </div>
+    </div>
+    <div class="qty-row">
+      <label>数量</label>
+      <button class="qty-btn" onclick="changeQty('p',-1)">−</button>
+      <input type="number" class="qty-num" id="qtyP" value="1" min="1" max="99" oninput="clampQty('p')">
+      <button class="qty-btn" onclick="changeQty('p',1)">+</button>
     </div>
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
     <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
@@ -762,7 +792,7 @@ var D={
     keyMap:{chest:0,hip:5,thigh:10},
     halfIdx:new Set([0,1,2,3,5,9,11,12,13,14,16,17,18,19]),
     wtRef:{160:{m:50,f:55},165:{m:52,f:58},170:{m:56,f:62},175:{m:59,f:65},180:{m:62,f:68},185:{m:65,f:71},190:{m:69,f:75}},
-    bodyRef:{160:{chest:86,hip:90,thigh:49},165:{chest:88,hip:93,thigh:51},170:{chest:91,hip:96,thigh:53},175:{chest:94,hip:99,thigh:55},180:{chest:96,hip:102,thigh:57},185:{chest:99,hip:104,thigh:58},190:{chest:102,hip:107,thigh:60}}
+    bodyRef:{160:{chest:86,hip:86,thigh:49},165:{chest:88,hip:88,thigh:51},170:{chest:91,hip:90,thigh:53},175:{chest:94,hip:93,thigh:55},180:{chest:96,hip:95,thigh:57},185:{chest:99,hip:97,thigh:58},190:{chest:102,hip:100,thigh:60}}
   }
 };
 
@@ -1735,6 +1765,28 @@ function toggleCustom(inputId,checked){
   if(!checked) document.getElementById(inputId).value='';
 }
 
+// ===== 数量选择器 =====
+var qtyMap={m:'qtyM',e:'qtyE',p:'qtyP'};
+function changeQty(key,delta){
+  var id=qtyMap[key]; if(!id) return;
+  var el=document.getElementById(id); if(!el) return;
+  var v=parseInt(el.value)||1;
+  v=Math.max(1,Math.min(99,v+delta));
+  el.value=v;
+}
+function clampQty(key){
+  var id=qtyMap[key]; if(!id) return;
+  var el=document.getElementById(id); if(!el) return;
+  var v=parseInt(el.value)||1;
+  el.value=Math.max(1,Math.min(99,v));
+}
+function getQty(mode){
+  var key=mode==='manual'?'m':mode==='pro'?'p':'e';
+  var id=qtyMap[key]; if(!id) return 1;
+  var el=document.getElementById(id);
+  return el?Math.max(1,parseInt(el.value)||1):1;
+}
+
 // ===== 工具函数 =====
 function fin(db,sz,col){
   var v=db.data[sz][col];
@@ -1882,12 +1934,14 @@ function calc(){
     sz=calcByH(h,w,db);
   }else{
     var name=document.getElementById('iName2').value.trim();
+    var h2=parseFloat(document.getElementById('iH2').value)||0;
     var c=parseFloat(document.getElementById('iC').value);
     var hp=parseFloat(document.getElementById('iHp').value);
     var t=parseFloat(document.getElementById('iT').value);
     if(!name){showToast('⚠️ 请输入队员姓名（必填项）');document.getElementById('iName2').focus();return}
+    if(!h2){showToast('⚠️ 请填写身高');document.getElementById('iH2').focus();return}
     if(!c||!hp||!t){showToast('⚠️ 请填写完整的胸围、臀围、大腿围');return}
-    inputs.name=name;inputs.chest=c;inputs.hip=hp;inputs.thigh=t;inputs.fit=fit;
+    inputs.name=name;inputs.height=h2;inputs.chest=c;inputs.hip=hp;inputs.thigh=t;inputs.fit=fit;
     sz=calcByM(c,hp,t,fit,db);
   }
 
@@ -1973,20 +2027,22 @@ function showTable(){
   html+='<thead><tr style="background:var(--bg);position:sticky;top:0">';
   html+='<th>尺码</th><th>身高</th><th>参考体重</th><th>胸围</th><th>臀围</th><th>大腿围</th></tr></thead><tbody>';
   var sizes=CHILD_SIZES.concat(ADULT_SIZES);
-  var bodyRef=Object.assign({},D.child.bodyRef,D.adult.bodyRef);
   var wtRef=Object.assign({},D.child.wtRef,D.adult.wtRef);
   var childSet={};CHILD_SIZES.forEach(function(s){childSet[s]=true});
   sizes.forEach(function(s){
-    var b=bodyRef[s]||{};
+    var db=childSet[s]?D.child:D.adult;
     var w=wtRef[s];
     var isChild=childSet[s];
     var cls=isChild?' style="background:#fdfdff"':'';
+    var chest=fin(db,s,db.keyMap.chest);
+    var hip=fin(db,s,db.keyMap.hip);
+    var thigh=fin(db,s,db.keyMap.thigh);
     html+='<tr'+cls+'><td style="font-weight:700;color:'+(isChild?'var(--accent2)':'var(--accent)')+'">'+s+'码</td>';
     html+='<td>'+s+'cm</td>';
     html+='<td>'+(w?w.f+'kg':'—')+'</td>';
-    html+='<td>'+(b.chest||'—')+'cm</td>';
-    html+='<td>'+(b.hip||'—')+'cm</td>';
-    html+='<td>'+(b.thigh||'—')+'cm</td></tr>';
+    html+='<td>'+chest+'cm</td>';
+    html+='<td>'+hip+'cm</td>';
+    html+='<td>'+thigh+'cm</td></tr>';
   });
   html+='</tbody></table>';
   document.getElementById('modalTitle').textContent='尺码对照表（儿童+成人）';
@@ -2033,7 +2089,7 @@ function showResult(sz,inputs,db){
     tag.textContent='🍔 加肥版 · +¥20';
     tag.className='tag loose';
   }else{
-    tag.textContent=mode==='easy'?'标准款 · 身高体重推荐':'标准款 · 竞技贴身';
+    tag.textContent='标准款 · 身高体重推荐';
     tag.className='tag tight';
   }
   // 加肥版：胸围/臀围/大腿围取下一码数据
@@ -2047,7 +2103,7 @@ function showResult(sz,inputs,db){
   tbody.innerHTML='';
   if(mode==='easy'){
     // 简易模式：成品尺寸 + 松量（对比标准净体参考值）
-    thead.innerHTML='<tr><th>部位</th><th>成品尺寸</th><th>松量</th></tr>';
+    thead.innerHTML='<tr><th>部位</th><th title="标准款速滑服参考成品尺寸，不同版型/面料可能有差异">成品尺寸 ℹ️</th><th title="系统推荐尺码对应的标准人体净尺寸，非购买者真实参数">标准人体 ℹ️</th><th title="成品尺寸 − 标准人体 = 松量，正值宽松/负值紧身">松量 ℹ️</th><th>评价</th></tr>';
     var allParts=[
       {name:'胸围',idx:db.keyMap.chest,refKey:'chest'},
       {name:'臀围',idx:db.keyMap.hip,refKey:'hip'},
@@ -2056,15 +2112,17 @@ function showResult(sz,inputs,db){
     var ref=db.bodyRef[sz];
     allParts.forEach(function(p){
       var fv=fin(db,fatSz,p.idx);
-      var refVal=ref?p.refKey?ref[p.refKey]:0:0;
+      var refVal=ref&&ref[p.refKey]?ref[p.refKey]:0;
       var sl=Math.round((fv-refVal)*10)/10;
-      var cls=sl>=2?'ok':sl>=-2?'ok':sl>=-5?'warn':'bad';
+      var cls='ok';
       var sign=sl>0?'+':'';
-      tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td><td><span class="'+cls+'">'+sign+sl+'cm</span></td></tr>';
+      var rating=sl>=-5?'✅ 合适':'👌 宽松';
+      tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td><td>'+(refVal||'—')+'cm</td><td><span class="'+cls+'">'+sign+sl+'cm</span></td><td><span class="'+cls+'">'+rating+'</span></td></tr>';
     });
+    tbody.innerHTML+='<tr><td colspan="5" style="font-size:10px;color:var(--text3);padding-top:8px">💡 成品尺寸为参考值（不同版型/面料有差异） · 标准人体为推荐尺码对应的标准净体尺寸，非购买者真实参数</td></tr>';
   }else{
-    // 专业模式：带三围对比和松量，不显示衣长等额外参数
-    thead.innerHTML='<tr><th>部位</th><th>孩子尺寸</th><th>成品尺寸</th><th>松量</th></tr>';
+    // 专业模式：带三围对比和松量
+    thead.innerHTML='<tr><th>部位</th><th title="购买者实际测量尺寸">实测尺寸 ℹ️</th><th title="标准款速滑服参考成品尺寸，不同版型/面料可能有差异">成品尺寸 ℹ️</th><th title="成品尺寸 − 实测尺寸 = 松量，正值宽松/负值紧身">松量 ℹ️</th><th>评价</th></tr>';
     var keyParts=[
       {name:'胸围',idx:db.keyMap.chest,uVal:inputs.chest},
       {name:'臀围',idx:db.keyMap.hip,uVal:inputs.hip},
@@ -2072,15 +2130,17 @@ function showResult(sz,inputs,db){
     ];
     keyParts.forEach(function(p){
       var fv=fin(db,fatSz,p.idx);
-      var slackHtml='—';
+      var slackHtml='—',ratingHtml='—';
       if(p.uVal){
         var sl=Math.round((fv-p.uVal)*10)/10;
-        var cls=sl>=2?'ok':sl>=-2?'ok':sl>=-5?'warn':'bad';
+        var cls='ok';
         var sign=sl>0?'+':'';
         slackHtml='<span class="'+cls+'">'+sign+sl+'cm</span>';
+        ratingHtml='<span class="'+cls+'">'+(sl>=-5?'✅ 合适':'👌 宽松')+'</span>';
       }
-      tbody.innerHTML+='<tr><td>'+p.name+'</td><td>'+(p.uVal?p.uVal+'cm':'未量')+'</td><td class="v">'+fv+'cm</td><td>'+slackHtml+'</td></tr>';
+      tbody.innerHTML+='<tr><td>'+p.name+'</td><td>'+(p.uVal?p.uVal+'cm':'未量')+'</td><td class="v">'+fv+'cm</td><td>'+slackHtml+'</td><td>'+ratingHtml+'</td></tr>';
     });
+    tbody.innerHTML+='<tr><td colspan="5" style="font-size:10px;color:var(--text3);padding-top:8px">💡 成品尺寸为参考值（不同版型/面料有差异） · 实测尺寸为购买者提供的身体数据</td></tr>';
   }
   var tip=document.getElementById('rTip');
   if(mode==='easy'){
@@ -2147,6 +2207,9 @@ async function addToCart(){
   var detail='';
   if(lastResult.inputs.mode==='manual'){
     detail='✋ 自选';
+  }else if(lastResult.inputs.mode==='pro'){
+    detail='胸'+lastResult.inputs.chest+' / 臀'+lastResult.inputs.hip+' / 腿'+lastResult.inputs.thigh;
+    if(lastResult.inputs.height) detail=lastResult.inputs.height+'cm · '+detail;
   }else if(lastResult.inputs.height){
     detail=lastResult.inputs.height+'cm';
     if(lastResult.inputs.weight>0) detail+=' / '+lastResult.inputs.weight+'kg';
@@ -2161,7 +2224,8 @@ async function addToCart(){
     age:lastResult.age,
     addFat:lastResult.addFat||false,
     scheme:schemeName,
-    custom:custom
+    custom:custom,
+    qty:getQty(mode)
   };
 
   var btn=document.getElementById('btnAddCart');
@@ -2196,17 +2260,21 @@ async function addToCart(){
     if(mode==='manual'){
       document.getElementById('iNameM').value='';
       document.getElementById('iSizeM').value='';
+      document.getElementById('qtyM').value='1';
       document.getElementById('iNameM').focus();
     }else if(mode==='easy'){
       document.getElementById('iName1').value='';
       document.getElementById('iH').value='';
       document.getElementById('iW').value='';
+      document.getElementById('qtyE').value='1';
       document.getElementById('iName1').focus();
     }else{
       document.getElementById('iName2').value='';
+      document.getElementById('iH2').value='';
       document.getElementById('iC').value='';
       document.getElementById('iHp').value='';
       document.getElementById('iT').value='';
+      document.getElementById('qtyP').value='1';
       document.getElementById('iName2').focus();
     }
   },300);
@@ -2231,10 +2299,11 @@ function renderCoachView(){
   var html='<div class="coach-list">';
   cartData.forEach(function(item,i){
     var schemeStr=item.scheme?' · '+item.scheme:'';
+    var qtyStr=(item.qty&&item.qty>1)?'<span style="font-size:10px;color:var(--accent2);margin-left:4px">×'+item.qty+'</span>':'';
     var customStr=item.custom&&item.custom.length>0?'<div style="font-size:10px;color:var(--purple);margin-top:1px">'+item.custom.join(' | ')+'</div>':'';
     html+='<div class="coach-item">'
       +'<div class="ci-info">'
-      +'<div class="ci-name">'+item.name+'</div>'
+      +'<div class="ci-name">'+item.name+qtyStr+'</div>'
       +'<div class="ci-detail">'+item.detail+schemeStr+customStr+'</div>'
       +'</div>'
       +'<div class="ci-size">'+item.sz+(item.addFat?'🍔+20':'')+'</div>'
@@ -2247,7 +2316,7 @@ function renderCoachView(){
   var sizes=D[age].sizes;
   var countMap={};
   sizes.forEach(function(s){countMap[s]=0});
-  cartData.forEach(function(item){if(item.age===age)countMap[item.sz]=(countMap[item.sz]||0)+1});
+  cartData.forEach(function(item){if(item.age===age)countMap[item.sz]=(countMap[item.sz]||0)+(item.qty||1)});
 
   html+='<div class="coach-summary">'
     +'<h4>📊 尺码汇总统计</h4>'
@@ -2351,7 +2420,7 @@ function exportExcel(){
   var sizes=D[age].sizes;
   var countMap={};
   sizes.forEach(function(s){countMap[s]=0});
-  cartData.forEach(function(item){countMap[item.sz]=(countMap[item.sz]||0)+1});
+  cartData.forEach(function(item){countMap[item.sz]=(countMap[item.sz]||0)+(item.qty||1)});
   csv+='\n尺码汇总\n';
   sizes.forEach(function(s){
     var c=countMap[s]||0;
@@ -2415,9 +2484,6 @@ function openModal(){
   document.getElementById('modalTitle').textContent=age==='child'?'儿童款成品尺寸对照（整围·含缩率）':'成人款成品尺寸对照（整围·含缩率）';
   document.getElementById('modalBg').classList.add('show');
 }
-function closeModal(){
-  document.getElementById('modalBg').classList.remove('show');
-}
 
 // ===== 管理员功能 =====
 var isAdmin=false;
@@ -2427,7 +2493,15 @@ function adminLogin(){
     document.getElementById('adminModal').classList.add('show');
     return;
   }
-  var pw=prompt('请输入管理员密码');
+  // 使用自定义密码输入弹窗代替prompt
+  document.getElementById('modalTitle').textContent='🔑 管理员登录';
+  document.getElementById('modalContent').innerHTML='<div style="text-align:center;padding:10px 0"><input type="password" id="adminPwdInput" placeholder="请输入管理员密码" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;text-align:center" onkeydown="if(event.key===\'Enter\')submitAdminPwd()"></div><div style="display:flex;gap:8px;justify-content:center;margin-top:12px"><button onclick="submitAdminPwd()" class="submit" style="flex:1">确认</button><button onclick="closeModal()" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:14px;cursor:pointer">取消</button></div>';
+  document.getElementById('modalBg').classList.add('show');
+  setTimeout(function(){document.getElementById('adminPwdInput').focus()},300);
+}
+function submitAdminPwd(){
+  var pw=document.getElementById('adminPwdInput').value;
+  closeModal();
   if(pw==='LOL365'){
     isAdmin=true;
     localStorage.setItem('cg_admin','1');
@@ -2438,7 +2512,7 @@ function adminLogin(){
     loadAdminTeams();
     document.getElementById('adminModal').classList.add('show');
     showToast('🔑 管理员已登录');
-  }else if(pw!==null){
+  }else if(pw){
     showToast('❌ 密码错误');
   }
 }
