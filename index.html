@@ -463,7 +463,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <div id="coachContent"></div>
   </div>
 
-  <div class="foot">晨哥团队队服定制 · 山东威海 · 速滑服专业定制</div>
+  <div class="foot">团队队服定制 · 山东威海 · 速滑服专业定制</div>
 </div>
 
 <!-- 尺码对照弹窗 -->
@@ -514,8 +514,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
         <input type="text" id="newTeamCode" placeholder="如：A3B9K2" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;text-align:center">
       </div>
       <div class="fg">
-        <label>晨哥姓名 <span class="req">*</span></label>
-        <input type="text" id="newCoachName" placeholder="如：晨哥">
+        <label>教练姓名 <span class="req">*</span></label>
+        <input type="text" id="newCoachName" placeholder="如：王教练">
       </div>
       <div class="fg">
         <label>手机号 <span class="hint">（选填）</span></label>
@@ -738,7 +738,7 @@ var D={
 };
 
 // ===== 单价 & 权益体系 =====
-var UNIT_PRICE=0; // 价格由晨哥手动填写，不再自动计算
+var UNIT_PRICE=0; // 价格由教练手动填写，不再自动计算
 
 var BENEFIT_LEVELS=[
   {minAmount:0,   label:'基础',  freeShip:false,iceTowel:0, discount:1.0, badge:'bronze'},
@@ -1045,7 +1045,7 @@ async function submitCreateTeam(){
   if(code==='000000'){showToast('⚠️ 000000 为零售专用码，不可创建');document.getElementById('newTeamCode').focus();return}
   if(code.length!==6){showToast('⚠️ 团队码必须是6位，您输入了'+code.length+'位');document.getElementById('newTeamCode').focus();return}
   if(!/^[A-Z0-9]{6}$/.test(code)){showToast('⚠️ 团队码只能包含字母和数字');document.getElementById('newTeamCode').focus();return}
-  if(!coachName){showToast('⚠️ 请输入晨哥姓名');document.getElementById('newCoachName').focus();return}
+  if(!coachName){showToast('⚠️ 请输入教练姓名');document.getElementById('newCoachName').focus();return}
 
   // 防止重复点击
   if(btn){btn.disabled=true;btn.textContent='创建中...';}
@@ -1473,7 +1473,7 @@ async function doCreateOrder(){
   // 步骤4: 显示成功弹窗
   showOrderProgress(3,'下单成功！');
 
-  var coachName=teamProfile?teamProfile.coach_name:'晨哥';
+  var coachName=teamProfile?teamProfile.coach_name:'';
   var coachPhone2=teamProfile&&teamProfile.phone?teamProfile.phone:'';
   var detailHtml=order.items.map(function(it){return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>'+it.name+'</span><span style="color:var(--text3)">'+it.size+'码</span></div>';}).join('');
 
@@ -2293,7 +2293,7 @@ function copySummary(){
   if(cartData.length===0){showToast('选购清单为空');return}
   var text='📋 速滑服尺码汇总\n';
   text+='团队码：'+teamCode+'\n';
-  if(teamProfile&&teamProfile.coach_name) text+='晨哥：'+teamProfile.coach_name+'\n';
+  if(teamProfile&&teamProfile.coach_name) text+='教练：'+teamProfile.coach_name+'\n';
   text+='款式：'+(age==='child'?'儿童款':'成人款')+(addFat?' | 加肥版(+¥20)':'')+'\n';
   text+='合计：'+cartData.length+'件\n';
   text+='明细：\n';
@@ -2584,7 +2584,7 @@ async function loadOrders(){
 }
 
 async function confirmPayment(orderId,totalItems){
-  // 弹出输入框让晨哥填写成交价格
+  // 弹出输入框填写成交价格
   var inputHtml='<div style="text-align:center">'
     +'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">本单共 <b>'+totalItems+'</b> 件，请输入最终成交价格</div>'
     +'<input type="number" id="manualPriceInput" placeholder="如：3600" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:18px;text-align:center;outline:none" oninput="this.style.borderColor=this.value?\'var(--accent)\':\'var(--border)\'">'
@@ -2868,7 +2868,7 @@ function exportCurrentOrder(){
   row13.push('');
   data.push(row13);
 
-  // Row 14: 合计（价格留空，晨哥手动填）
+  // Row 14: 合计（价格留空，手动填）
   data.push(['','合计','','','','','','','','','','','']);
 
   // 创建工作簿
