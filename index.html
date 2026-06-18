@@ -334,6 +334,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       <div class="m-sub">查看汇总 · 下单</div>
       <div class="badge" id="coachBadge">0</div>
     </div>
+    <div class="mode-btn" data-v="manual">
+      <div class="m-icon">✋</div>
+      <div class="m-title">自己选号</div>
+      <div class="m-sub">直接选码 · 加入清单</div>
+    </div>
+  </div>
+
+  <!-- 方式0：自己选号 -->
+  <div class="card" id="cardManual" style="display:none">
+    <div class="fg">
+      <label>队员姓名 <span class="req">*</span> <span class="hint">（必填，重复姓名无法添加）</span></label>
+      <input type="text" id="iNameM" placeholder="如：张小明">
+    </div>
+    <div class="fg">
+      <label>选择尺码 <span class="req">*</span></label>
+      <select id="iSizeM" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:17px;font-weight:700;background:var(--bg);color:var(--text);appearance:auto">
+        <option value="">请选择尺码</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:4px;justify-content:center">
+      <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
+    </div>
+    <button class="submit" onclick="confirmManualSize()" style="margin-top:12px">✅ 确认尺码，加入选购清单</button>
   </div>
 
   <!-- 方式1：身高体重 -->
@@ -376,12 +399,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
     <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
       <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
-      <button class="btn-link" onclick="toggleManualSize()">✋ 自己选号</button>
-    </div>
-    <div id="manualSizeArea" style="text-align:center;display:none">
-      <select id="manualSizeSelect" onchange="onManualSizeChange()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);font-size:15px;font-weight:700;background:var(--bg);color:var(--text);margin-top:6px">
-        <option value="">选择尺码</option>
-      </select>
     </div>
   </div>
 
@@ -427,12 +444,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
     <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
       <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
-      <button class="btn-link" onclick="toggleManualSize()">✋ 自己选号</button>
-    </div>
-    <div id="manualSizeArea2" style="text-align:center;display:none">
-      <select id="manualSizeSelect2" onchange="onManualSizeChange2()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);font-size:15px;font-weight:700;background:var(--bg);color:var(--text);margin-top:6px">
-        <option value="">选择尺码</option>
-      </select>
     </div>
   </div>
 
@@ -1814,8 +1825,10 @@ document.querySelectorAll('.mode-btn').forEach(function(el){
     document.getElementById('cardEasy').style.display=mode==='easy'?'block':'none';
     document.getElementById('cardPro').style.display=mode==='pro'?'block':'none';
     document.getElementById('cardCoach').style.display=mode==='coach'?'block':'none';
+    document.getElementById('cardManual').style.display=mode==='manual'?'block':'none';
     document.getElementById('res').classList.remove('show');
     if(mode==='coach') renderCoachView();
+    if(mode==='manual') initManualSizeSelect();
   };
 });
 document.querySelectorAll('.fit-card').forEach(function(el){
@@ -1982,39 +1995,32 @@ function showTable(){
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('show')}
 
-// ===== 手动选号 =====
-function toggleManualSize(){
-  var a=document.getElementById('manualSizeArea');
-  var a2=document.getElementById('manualSizeArea2');
-  var target=a||a2; if(!target) return;
-  if(target.style.display==='none'||!target.style.display){
-    var sel=document.getElementById('manualSizeSelect')||document.getElementById('manualSizeSelect2');
-    if(!sel) return;
-    sel.innerHTML='<option value="">选择尺码</option>';
-    var sizes=CHILD_SIZES.concat(ADULT_SIZES);
-    sizes.forEach(function(s){sel.innerHTML+='<option value="'+s+'">'+s+'码</option>'});
-    if(a) a.style.display='block';
-    if(a2) a2.style.display='block';
-  }else{
-    if(a) a.style.display='none';
-    if(a2) a2.style.display='none';
-  }
+// ===== 自己选号（独立模式） =====
+function initManualSizeSelect(){
+  var sel=document.getElementById('iSizeM');
+  if(!sel||sel.options.length>1) return;
+  sel.innerHTML='<option value="">请选择尺码</option>';
+  var sizes=CHILD_SIZES.concat(ADULT_SIZES);
+  sizes.forEach(function(s){sel.innerHTML+='<option value="'+s+'">'+s+'码</option>'});
 }
-function onManualSizeChange(){applyManualSize(1)}
-function onManualSizeChange2(){applyManualSize(2)}
-function applyManualSize(n){
-  var sel=document.getElementById('manualSizeSelect'+(n===2?'2':''));
-  var area=document.getElementById('manualSizeArea'+(n===2?'2':''));
-  var sz=parseInt(sel.value); if(!sz) return;
-  if(area) area.style.display='none';
-  lastResult=sz;
-  document.getElementById('rSize').textContent=sz;
-  document.getElementById('rLabel').textContent='手动选号';
-  var tag=document.getElementById('rTag'); tag.textContent='✋ 自选 · '+sz+'码'; tag.className='tag tight';
-  var db=D[age];
-  if(age==='child'&&sz>=160){var ad=D.adult;db=Object.assign({},db,{data:Object.assign({},db.data,ad.data),sizes:CHILD_SIZES.concat(ADULT_SIZES),bodyRef:Object.assign({},db.bodyRef,ad.bodyRef)})}
-  if(age!=='child'&&sz<160){var cd=D.child;db=Object.assign({},db,{data:Object.assign({},cd.data,db.data),bodyRef:Object.assign({},cd.bodyRef,db.bodyRef)})}
-  try{showResult(sz,{mode:mode},db)}catch(e){}
+function confirmManualSize(){
+  var name=document.getElementById('iNameM').value.trim();
+  var sz=parseInt(document.getElementById('iSizeM').value);
+  if(!name){showToast('⚠️ 请输入队员姓名');document.getElementById('iNameM').focus();return}
+  if(!sz){showToast('⚠️ 请选择尺码');document.getElementById('iSizeM').focus();return}
+  // 查重
+  var duplicate=cartData.find(function(item){return item.name===name});
+  if(duplicate){showToast('⚠️ 姓名「'+name+'」已存在，如需修改请先删除再重新添加');return}
+  // 判断年龄
+  var itemAge=CHILD_SIZES.indexOf(sz)>=0?'child':'adult';
+  // 构造 lastResult 供 addToCart 使用
+  lastResult={
+    sz:sz,
+    age:itemAge,
+    addFat:false,
+    inputs:{name:name,mode:'manual'}
+  };
+  addToCart();
 }
 // ===== 展示结果 =====
 function showResult(sz,inputs,db){
@@ -2139,7 +2145,9 @@ async function addToCart(){
   var schemeName=scheme?scheme.name:'';
 
   var detail='';
-  if(lastResult.inputs.height){
+  if(lastResult.inputs.mode==='manual'){
+    detail='✋ 自选';
+  }else if(lastResult.inputs.height){
     detail=lastResult.inputs.height+'cm';
     if(lastResult.inputs.weight>0) detail+=' / '+lastResult.inputs.weight+'kg';
   }else{
@@ -2185,7 +2193,11 @@ async function addToCart(){
   updateBadge();
 
   setTimeout(function(){
-    if(mode==='easy'){
+    if(mode==='manual'){
+      document.getElementById('iNameM').value='';
+      document.getElementById('iSizeM').value='';
+      document.getElementById('iNameM').focus();
+    }else if(mode==='easy'){
       document.getElementById('iName1').value='';
       document.getElementById('iH').value='';
       document.getElementById('iW').value='';
