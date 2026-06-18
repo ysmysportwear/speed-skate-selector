@@ -374,6 +374,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       </div>
     </div>
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
+    <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
+      <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
+      <button class="btn-link" onclick="toggleManualSize()">✋ 自己选号</button>
+    </div>
+    <div id="manualSizeArea" style="text-align:center;display:none">
+      <select id="manualSizeSelect" onchange="onManualSizeChange()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);font-size:15px;font-weight:700;background:var(--bg);color:var(--text);margin-top:6px">
+        <option value="">选择尺码</option>
+      </select>
+    </div>
   </div>
 
   <!-- 方式2：三围 -->
@@ -416,6 +425,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       </div>
     </div>
     <button class="submit" onclick="calc()">🔍 推荐尺码</button>
+    <div style="display:flex;gap:6px;margin-top:6px;justify-content:center">
+      <button class="btn-link" onclick="showTable()">📋 尺码对照表</button>
+      <button class="btn-link" onclick="toggleManualSize()">✋ 自己选号</button>
+    </div>
+    <div id="manualSizeArea2" style="text-align:center;display:none">
+      <select id="manualSizeSelect2" onchange="onManualSizeChange2()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);font-size:15px;font-weight:700;background:var(--bg);color:var(--text);margin-top:6px">
+        <option value="">选择尺码</option>
+      </select>
+    </div>
   </div>
 
   <!-- 结果展示 -->
@@ -425,13 +443,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       <div class="unit" id="rLabel">推荐尺码</div>
       <div class="tag" id="rTag">—</div>
     </div>
-    <div id="manualSizeArea" style="text-align:center;margin:8px 0;display:none">
-      <select id="manualSizeSelect" onchange="onManualSizeChange()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);font-size:16px;font-weight:700;background:var(--bg);color:var(--text)">
-        <option value="">选择尺码</option>
-      </select>
-    </div>
     <div class="res-options">
-      <button class="submit" onclick="toggleManualSize()" style="margin-top:4px;font-size:12px;opacity:0.7">✋ 不听推荐，自己选号</button>
     </div>
     <div class="custom-section">
       <div class="cs-title">🖊️ 定制内容（选填）</div>
@@ -1941,30 +1953,57 @@ function calcByM(chest,hip,thigh,fitType,db){
   return sizes[bestIdx];
 }
 
+
+// ===== 尺码对照表 =====
+function showTable(){
+  var html='<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html+='<tr style="background:var(--bg)"><th>尺码</th><th>适合身高</th><th>参考体重</th></tr>';
+  var sizes=CHILD_SIZES.concat(ADULT_SIZES);
+  var db=D[age];
+  sizes.forEach(function(s){
+    var ref=db.wtRef[s];
+    html+='<tr><td style="font-weight:700;color:var(--accent)">'+s+'码</td><td>'+s+'cm</td><td>'+(ref?ref.f+'kg':'')+'</td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('modalTitle').textContent='尺码对照表';
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show')}
+
 // ===== 手动选号 =====
 function toggleManualSize(){
   var a=document.getElementById('manualSizeArea');
-  if(a.style.display==='none'||!a.style.display){
-    var sel=document.getElementById('manualSizeSelect');
+  var a2=document.getElementById('manualSizeArea2');
+  var target=a||a2; if(!target) return;
+  if(target.style.display==='none'||!target.style.display){
+    var sel=document.getElementById('manualSizeSelect')||document.getElementById('manualSizeSelect2');
+    if(!sel) return;
     sel.innerHTML='<option value="">选择尺码</option>';
-    var sizes=age==='child'?CHILD_SIZES:ADULT_SIZES;
+    var sizes=CHILD_SIZES.concat(ADULT_SIZES);
     sizes.forEach(function(s){sel.innerHTML+='<option value="'+s+'">'+s+'码</option>'});
-    a.style.display='block';
-  }else{ a.style.display='none'; }
+    if(a) a.style.display='block';
+    if(a2) a2.style.display='block';
+  }else{
+    if(a) a.style.display='none';
+    if(a2) a2.style.display='none';
+  }
 }
-function onManualSizeChange(){
-  var sz=parseInt(document.getElementById('manualSizeSelect').value);
-  if(!sz) return;
-  document.getElementById('manualSizeArea').style.display='none';
-  var db=D[age];
-  var inputs={mode:mode};
+function onManualSizeChange(){applyManualSize(1)}
+function onManualSizeChange2(){applyManualSize(2)}
+function applyManualSize(n){
+  var sel=document.getElementById('manualSizeSelect'+(n===2?'2':''));
+  var area=document.getElementById('manualSizeArea'+(n===2?'2':''));
+  var sz=parseInt(sel.value); if(!sz) return;
+  if(area) area.style.display='none';
   lastResult=sz;
   document.getElementById('rSize').textContent=sz;
-  document.getElementById('rLabel').textContent=age==='child'?'手动选号 · 儿童':'手动选号 · 成人';
-  var tag=document.getElementById('rTag');
-  tag.textContent='✋ 自选 · '+sz+'码';
-  tag.className='tag tight';
-  try{showResult(sz,inputs,db)}catch(e){}
+  document.getElementById('rLabel').textContent='手动选号';
+  var tag=document.getElementById('rTag'); tag.textContent='✋ 自选 · '+sz+'码'; tag.className='tag tight';
+  var db=D[age];
+  if(age==='child'&&sz>=160){var ad=D.adult;db=Object.assign({},db,{data:Object.assign({},db.data,ad.data),sizes:CHILD_SIZES.concat(ADULT_SIZES),bodyRef:Object.assign({},db.bodyRef,ad.bodyRef)})}
+  if(age!=='child'&&sz<160){var cd=D.child;db=Object.assign({},db,{data:Object.assign({},cd.data,db.data),bodyRef:Object.assign({},cd.bodyRef,db.bodyRef)})}
+  try{showResult(sz,{mode:mode},db)}catch(e){}
 }
 // ===== 展示结果 =====
 function showResult(sz,inputs,db){
