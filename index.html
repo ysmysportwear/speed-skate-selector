@@ -2434,6 +2434,8 @@ async function loadOrders(){
     var orderQuery=sb.from('orders').select('*');
     if(isAdmin&&window._adminViewTeam){orderQuery=orderQuery.eq('team_code',window._adminViewTeam)}
     else if(!isAdmin) orderQuery=orderQuery.eq('team_code',teamCode);
+    // else: admin 不设过滤，看全部
+    console.log('[loadOrders] isAdmin='+isAdmin+' team='+teamCode+' adminView='+(window._adminViewTeam||'全部'));
     var resp=await orderQuery.order('created_at',{ascending:false});
     if(resp.error){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">加载失败</div>';return}
 
