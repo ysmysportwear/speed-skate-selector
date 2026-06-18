@@ -549,7 +549,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
       <div class="fabric-row" id="configFabricRow"></div>
     </div>
     <div style="margin:12px 0">
-      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🪡 缝纫工艺</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🧷 缝纫工艺</div>
       <div id="configStitchRow" style="display:flex;gap:8px"></div>
     </div>
     <div style="margin:12px 0">
@@ -1261,7 +1261,7 @@ function confirmOrderConfig(){
 
   var configInfo='';
   if(fabricName) configInfo+='🧵 面料：'+fabricName+'<br>';
-  if(stitchName) configInfo+='🪡 工艺：'+stitchName+'<br>';
+  if(stitchName) configInfo+='🧷 工艺：'+stitchName+'<br>';
   if(remark) configInfo+='📝 备注：'+remark+'<br>';
 
   var confirmMsg='确定下单吗？<br><br>'
@@ -2461,7 +2461,7 @@ async function loadOrders(){
           html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📍 '+o.shipping_address+'</div>';
         }
         if(o.fabric||o.stitch){
-          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🪡 '+o.stitch:'')+'</div>';
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🧷 '+o.stitch:'')+'</div>';
         }
         html+='<div style="display:flex;justify-content:space-between;align-items:center">';
         html+='<span style="font-size:16px;font-weight:700;color:var(--accent)">'+o.total_items+'件</span>';
@@ -2499,7 +2499,7 @@ async function loadOrders(){
           html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📍 '+o.shipping_address+'</div>';
         }
         if(o.fabric||o.stitch){
-          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🪡 '+o.stitch:'')+'</div>';
+          html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+(o.fabric?'🧵 '+o.fabric:'')+(o.fabric&&o.stitch?' · ':'')+(o.stitch?'🧷 '+o.stitch:'')+'</div>';
         }
         html+='<div style="display:flex;justify-content:space-between;align-items:center">';
         html+='<span style="font-size:14px;font-weight:600;color:var(--accent)">'+o.total_items+'件'+(o.total_amount>0?' · ¥'+o.total_amount:'')+'</span>';
@@ -2638,7 +2638,7 @@ async function viewOrderDetail(orderId){
     }
     html+='<div>📦 状态：'+(o.status==='paid'?'✅ 已确认':'⏳ 待确认')+'</div>';
     if(o.fabric) html+='<div>🧵 面料：'+o.fabric+'</div>';
-    if(o.stitch) html+='<div>🪡 工艺：'+o.stitch+'</div>';
+    if(o.stitch) html+='<div>🧷 工艺：'+o.stitch+'</div>';
     if(o.remark) html+='<div>📝 备注：<span style="color:var(--text2)">'+o.remark+'</span></div>';
     html+='</div></div>';
 
