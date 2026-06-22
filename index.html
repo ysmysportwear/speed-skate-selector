@@ -147,7 +147,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .qty-num::-webkit-outer-spin-button,.qty-num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* Result */
-.res{display:none;margin-top:18px;animation:slideUp .35s cubic-bezier(.16,1,.3,1)}
+.res{display:none;margin-top:18px;}
 .res.show{display:block}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .res-hero{text-align:center;padding:36px 24px;background:linear-gradient(135deg,rgba(96,165,250,0.05),rgba(167,139,250,0.03));border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
@@ -323,8 +323,8 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .anim-in-d4{animation-delay:.20s}.anim-in-d5{animation-delay:.25s}.anim-in-d6{animation-delay:.30s}
 .anim-in-d7{animation-delay:.35s}.anim-in-d8{animation-delay:.40s}
 @keyframes animSlideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-@keyframes resultBoom{0%{opacity:0;transform:scale(.5) rotate(-5deg)}50%{transform:scale(1.1) rotate(1deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-.res-hero .size{animation:resultBoom .6s cubic-bezier(.34,1.56,.64,1) both}
+
+
 @keyframes glowPulse{0%,100%{box-shadow:0 0 10px rgba(56,189,248,0.1)}50%{box-shadow:0 0 30px rgba(56,189,248,0.3)}}
 .team-banner{animation:glowPulse 3s ease-in-out infinite}
 @keyframes ripple{to{transform:scale(4);opacity:0}}
@@ -849,12 +849,8 @@ document.addEventListener('mousemove',function(e){
 // ===== 点击爆散增强 =====
 var _origClick=document.addEventListener;
 document.addEventListener('click',function(e){
-  var btn=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.fat-option-card,.prod-chip');
-  if(btn){
-    var r=btn.getBoundingClientRect();
-    burstParticles(r.left+r.width/2,r.top+r.height/2,8);
-    floatEmoji(r.left+r.width/2,r.top,'⚡');
-  }
+  var btn=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.prod-chip');
+  
 });
 
 // ===== 推荐结果爆散 =====
@@ -863,11 +859,8 @@ if(window.showResult){var _sr2=window.showResult;window.showResult=function(sz,i
   var el=document.querySelector('.res-hero');
   if(el){
     var r=el.getBoundingClientRect();
-    burstParticles(r.left+r.width/2,r.top+r.height/2,20,'#00d4ff');
-    burstParticles(r.left+r.width/3,r.top+r.height/3,15,'#7dd3fc');
-    burstParticles(r.left+r.width*2/3,r.top+r.height/3,15,'#a78bfa');
-    setTimeout(function(){floatEmoji(r.left+r.width/2,r.top,'⚡')},200);
-    setTimeout(function(){floatEmoji(r.left+r.width/3,r.top,'🔥')},400);
+    
+                setTimeout(function(){floatEmoji(r.left+r.width/3,r.top,'🔥')},400);
     setTimeout(function(){floatEmoji(r.left+r.width*2/3,r.top,'💪')},600);
     setTimeout(function(){floatEmoji(r.left+r.width/2-10,r.top-20,'🎉')},800);
   }
@@ -877,12 +870,12 @@ if(window.showResult){var _sr2=window.showResult;window.showResult=function(sz,i
 (function(){var sl=document.createElement('div');sl.className='scanline-overlay';document.body.appendChild(sl)})();
 
 // ===== 按钮点击动画 =====
-document.addEventListener('click',function(e){var btn=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.fat-option-card,.prod-chip,.scheme-card,.fabric-card,.team-create,.team-input-row button,.ctf-submit');if(!btn)return;var r=document.createElement('span');r.className='rp';var rect=btn.getBoundingClientRect();var size=Math.max(rect.width,rect.height);r.style.width=r.style.height=size+'px';r.style.left=(e.clientX-rect.left-size/2)+'px';r.style.top=(e.clientY-rect.top-size/2)+'px';btn.appendChild(r);setTimeout(function(){r.remove()},500)});
+document.addEventListener('click',function(e){var btn=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.prod-chip,.scheme-card,.fabric-card,.team-create,.team-input-row button,.ctf-submit');if(!btn)return;var r=document.createElement('span');r.className='rp';var rect=btn.getBoundingClientRect();var size=Math.max(rect.width,rect.height);r.style.width=r.style.height=size+'px';r.style.left=(e.clientX-rect.left-size/2)+'px';r.style.top=(e.clientY-rect.top-size/2)+'px';btn.appendChild(r);setTimeout(function(){r.remove()},500)});
 
 // ===== 按键音效 =====
 (function(){function sf(f,v,d){try{var a=new(window.AudioContext||window.webkitAudioContext)();a.resume();var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d)}catch(e){}}
 document.addEventListener('click',function(e){
-  var b=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.fat-option-card,.prod-chip,.scheme-card,.fabric-card,.team-create,.team-input-row button,.ctf-submit');
+  var b=e.target.closest('button,.submit,.add-cart,.mode-btn,.seg-item,.fit-card,.prod-chip,.scheme-card,.fabric-card,.team-create,.team-input-row button,.ctf-submit');
   if(!b)return;sf(660,.08,.05);setTimeout(function(){sf(880,.06,.04)},25);
 })})();
 
@@ -2275,9 +2268,9 @@ function showResult(sz,inputs,db){
       var fv=fin(db,fatSz,p.idx);
       var refVal=ref&&ref[p.refKey]?ref[p.refKey]:0;
       var sl=Math.round((fv-refVal)*10)/10;
-      var cls='ok';
+      var cls=sl<=-8?'bad':sl<=-2?'warn':sl<=2?'ok':'warn';
       var sign=sl>0?'+':'';
-      var rating=sl>=-5?'✅ 合适':'👌 宽松';
+      var rating=sl<=-8?'🔴 偏紧':sl<=-2?'🟡 偏紧':sl<=2?'🟢 合身':'🟠 偏松';
       tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td><td>'+(refVal||'—')+'cm</td><td><span class="'+cls+'">'+sign+sl+'cm</span></td><td><span class="'+cls+'">'+rating+'</span></td></tr>';
     });
     tbody.innerHTML+='<tr><td colspan="5" style="font-size:10px;color:var(--text3);padding-top:8px">💡 成品尺寸为参考值（不同版型/面料有差异） · 标准人体为推荐尺码对应的标准净体尺寸，非购买者真实参数</td></tr>';
@@ -2297,7 +2290,9 @@ function showResult(sz,inputs,db){
         var cls='ok';
         var sign=sl>0?'+':'';
         slackHtml='<span class="'+cls+'">'+sign+sl+'cm</span>';
-        ratingHtml='<span class="'+cls+'">'+(sl>=-5?'✅ 合适':'👌 宽松')+'</span>';
+        var rating=sl<=-8?'🔴 偏紧':sl<=-2?'🟡 偏紧':sl<=2?'🟢 合身':'🟠 偏松';
+        ratingHtml='<span class="'+cls+'">'+rating+'</span>';
+        
       }
       tbody.innerHTML+='<tr><td>'+p.name+'</td><td>'+(p.uVal?p.uVal+'cm':'未量')+'</td><td class="v">'+fv+'cm</td><td>'+slackHtml+'</td><td>'+ratingHtml+'</td></tr>';
     });
@@ -2660,26 +2655,30 @@ function adminLogin(){
   document.getElementById('modalBg').classList.add('show');
   setTimeout(function(){document.getElementById('adminPwdInput').focus()},300);
 }
-function submitAdminPwd(){
+async function submitAdminPwd(){
   var pw=document.getElementById('adminPwdInput').value;
   closeModal();
-  if(pw==='LOL365'){
-    isAdmin=true;
-    localStorage.setItem('cg_admin','1');
-    document.getElementById('adminBar').style.display='block';
-    document.getElementById('adminBtn').style.opacity='1';
-    document.getElementById('adminBtn').style.background='var(--purple-bg)';
-    document.getElementById('adminBtn').style.borderColor='var(--purple)';
-    loadAdminTeams();
-    document.getElementById('adminModal').classList.add('show');
-    showToast('🔑 管理员已登录');
-  }else if(pw){
-    showToast('❌ 密码错误');
+  if(pw){
+    var enc=new TextEncoder();
+    var data=enc.encode(pw);
+    var hash=await crypto.subtle.digest('SHA-256',data);
+    var hashHex=Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    if(hashHex==='cce4ceabd9b0145535a1666c6e0abf2332b4804914486ed90c63ec641fd8a7f2'){
+      isAdmin=true;
+      localStorage.setItem('cg_admin_session',hashHex);
+      document.getElementById('adminBar').style.display='block';
+      document.getElementById('adminBtn').style.opacity='1';
+      document.getElementById('adminBtn').style.background='var(--purple-bg)';
+      document.getElementById('adminBtn').style.borderColor='var(--purple)';
+      loadAdminTeams();
+      document.getElementById('adminModal').classList.add('show');
+    }else{
+      showToast('❌ 密码错误');
+    }
   }
-}
-function adminLogout(){
+}function adminLogout(){
   isAdmin=false;
-  localStorage.removeItem('cg_admin');
+  localStorage.removeItem('cg_admin_session');
   document.getElementById('adminBar').style.display='none';
   document.getElementById('adminBtn').style.opacity='.5';
   document.getElementById('adminBtn').style.background='';
@@ -2735,7 +2734,7 @@ async function deleteTeam(teamCode,totalOrders){
 // ===== 初始化 =====
 (function init(){
   // 自动恢复管理员登录
-  if(localStorage.getItem('cg_admin')==='1'){
+  if(localStorage.getItem('cg_admin_session')==='cce4ceabd9b0145535a1666c6e0abf2332b4804914486ed90c63ec641fd8a7f2'||localStorage.getItem('cg_admin')==='1'){
     isAdmin=true;
     document.getElementById('adminBar').style.display='block';
     document.getElementById('adminBtn').style.opacity='1';
