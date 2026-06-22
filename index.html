@@ -2258,24 +2258,17 @@ function showResult(sz,inputs,db){
   var tbody=document.getElementById('rBody');
   tbody.innerHTML='';
   if(mode==='easy'){
-    // 简易模式：成品尺寸 + 松量（对比标准净体参考值）
-    thead.innerHTML='<tr><th>部位</th><th title="标准款速滑服参考成品尺寸，不同版型/面料可能有差异">成品尺寸 ℹ️</th><th title="系统推荐尺码对应的标准人体净尺寸，非购买者真实参数">标准人体 ℹ️</th><th title="成品尺寸 − 标准人体 = 松量，正值宽松/负值紧身">松量 ℹ️</th><th>评价</th></tr>';
+    // 简易模式：只显示成品尺寸
+    thead.innerHTML='<tr><th>部位</th><th>成品尺寸</th></tr>';
     var allParts=[
-      {name:'胸围',idx:db.keyMap.chest,refKey:'chest'},
-      {name:'臀围',idx:db.keyMap.hip,refKey:'hip'},
-      {name:'大腿围',idx:db.keyMap.thigh,refKey:'thigh'},
+      {name:'胸围',idx:db.keyMap.chest},
+      {name:'臀围',idx:db.keyMap.hip},
+      {name:'大腿围',idx:db.keyMap.thigh},
     ];
-    var ref=db.bodyRef[sz];
     allParts.forEach(function(p){
       var fv=fin(db,fatSz,p.idx);
-      var refVal=ref&&ref[p.refKey]?ref[p.refKey]:0;
-      var sl=Math.round((fv-refVal)*10)/10;
-      var cls=sl<=-8?'bad':sl<=-2?'warn':sl<=2?'ok':'warn';
-      var sign=sl>0?'+':'';
-      var rating=sl<=-8?'🔴 偏紧':sl<=-2?'🟡 偏紧':sl<=2?'🟢 合身':'🟠 偏松';
-      tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td><td>'+(refVal||'—')+'cm</td><td><span class="'+cls+'">'+sign+sl+'cm</span></td><td><span class="'+cls+'">'+rating+'</span></td></tr>';
+      tbody.innerHTML+='<tr><td>'+p.name+'</td><td class="v">'+fv+'cm</td></tr>';
     });
-    tbody.innerHTML+='<tr><td colspan="5" style="font-size:10px;color:var(--text3);padding-top:8px">💡 成品尺寸为参考值（不同版型/面料有差异） · 标准人体为推荐尺码对应的标准净体尺寸，非购买者真实参数</td></tr>';
   }else{
     // 专业模式：带三围对比和松量
     thead.innerHTML='<tr><th>部位</th><th title="购买者实际测量尺寸">实测尺寸 ℹ️</th><th title="标准款速滑服参考成品尺寸，不同版型/面料可能有差异">成品尺寸 ℹ️</th><th title="成品尺寸 − 实测尺寸 = 松量，正值宽松/负值紧身">松量 ℹ️</th><th>评价</th></tr>';
