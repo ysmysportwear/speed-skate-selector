@@ -73,7 +73,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .seg-item:hover{color:var(--text)}
 .seg-item.on{background:#e0f4ff;color:#0a3d5c;font-weight:700;box-shadow:0 0 0 2px #7dd3fc,0 0 60px rgba(56,189,248,0.4)}
 
-.card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:14px;border:1px solid var(--border);}
+.card{background:linear-gradient(135deg,rgba(18,18,26,0.7),rgba(18,18,26,0.4));backdrop-filter:blur(10px);border-radius:var(--radius);padding:24px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 8px 32px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,0.03) inset}
 .mode-switch{display:flex;gap:8px;margin-bottom:18px}
 .mode-btn{flex:1;padding:12px 6px;border-radius:12px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:all .2s;background:var(--card);position:relative;}
 .mode-btn:hover{border-color:rgba(56,189,248,0.3)}
@@ -134,7 +134,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .custom-option input[type="text"]{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:var(--card2);color:var(--text);transition:all .2s}
 .custom-option input[type="text"]:focus{border-color:var(--accent)}
 
-.submit{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7dd3fc);color:#0a0e1a;transition:all .2s;letter-spacing:1px}
+.submit{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7dd3fc);color:#0a0e1a;transition:all .3s;letter-spacing:2px;box-shadow:0 4px 20px rgba(0,212,255,0.2)}.submit:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,212,255,0.35)}.submit:active{transform:scale(.97)}
 .submit:hover{box-shadow:0 0 25px rgba(56,189,248,0.3)}
 .submit:active{transform:scale(.97)}
 
@@ -2041,7 +2041,9 @@ document.querySelectorAll('.fit-card').forEach(function(el){
     document.querySelectorAll('.fit-card').forEach(function(e){e.classList.toggle('on',e.dataset.v===fit)});
   };
 });
-function selectFat(el,val){
+var _audioCtx=null;function playClickSound(){if(!_audioCtx)try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return}var o=_audioCtx.createOscillator();var g=_audioCtx.createGain();o.connect(g);g.connect(_audioCtx.destination);o.type='sine';o.frequency.value=800;g.gain.setValueAtTime(.08,_audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,_audioCtx.currentTime+.06);o.start(_audioCtx.currentTime);o.stop(_audioCtx.currentTime+.06)}
+
+function selectFat(el,val){playClickSound();
   addFat=val;
   document.querySelectorAll('#fatRowEasy .fat-option-card').forEach(function(e){e.classList.toggle('on',e===el)});
   // 如果已有结果，重新计算
@@ -2058,7 +2060,7 @@ function selectFat(el,val){
   }
 }
 // 专业模式加肥选择
-function selectFatPro(el,val){
+function selectFatPro(el,val){playClickSound();
   addFat=val;
   document.querySelectorAll('#fatRowPro .fat-option-card').forEach(function(e){e.classList.toggle('on',e===el)});
 }
