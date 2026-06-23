@@ -181,11 +181,11 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:100;justify-content:center;align-items:flex-end}
 .modal-bg.show{display:flex}
 .modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto;;border-top:1px solid var(--border)}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:12px;text-align:center;color:var(--text)}
-.modal table{width:100%;border-collapse:collapse;font-size:11px}
-.modal th{padding:6px 4px;border-bottom:1.5px solid var(--border);font-weight:500;color:var(--text3);font-size:10px;text-align:center}
-.modal td{padding:5px 4px;border-bottom:.5px solid rgba(255,255,255,0.04);text-align:center;font-family:monospace;font-size:11px;color:var(--text2)}
-.modal td:first-child{text-align:left;font-family:inherit;font-weight:500;color:var(--text)}
+.modal h3{font-size:16px!important;font-weight:700!important;margin-bottom:14px;text-align:center;color:var(--text)!important;padding:10px 14px;background:var(--card2)!important;border-radius:10px;letter-spacing:1px;border:1px solid var(--border)}
+.modal table{width:100%;border-collapse:collapse;font-size:13px}
+.modal th{padding:12px 8px;border-bottom:1.5px solid var(--border);font-weight:600;color:var(--text2);font-size:13px;text-align:center}
+.modal td{padding:10px 8px;border-bottom:.5px solid rgba(255,255,255,0.04);text-align:center;font-family:monospace;font-size:13px;color:var(--text2)}
+.modal td:first-child{text-align:left;font-family:inherit;font-weight:600;color:var(--text);font-size:14px}
 .modal .highlight{background:var(--accent-bg);font-weight:600;color:var(--accent)}
 .modal .close{text-align:center;padding:14px;cursor:pointer;font-size:13px;font-weight:500;color:var(--accent);margin-top:8px;transition:color .2s}
 .modal .close:hover{color:#7dd3fc}
@@ -200,6 +200,10 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .coach-item .ci-info{flex:1;min-width:0}
 .coach-item .ci-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px}
 .coach-item .ci-detail{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* btn-link 尺码对照表按钮 */
+.btn-link{display:block;background:none;color:var(--text3);font-size:13px;cursor:pointer;padding:6px 0;transition:color .2s;width:100%;text-align:center;border:none}
+.btn-link:hover{color:var(--accent)}
 .coach-item .ci-size{font-size:20px;font-weight:800;color:var(--accent);min-width:40px;text-align:center}
 .coach-item .ci-del{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--danger);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
 .coach-item .ci-del:hover{background:var(--danger-bg);border-color:var(--danger)}
@@ -2179,9 +2183,9 @@ function calcByM(chest,hip,thigh,fitType,db){
 
 // ===== 尺码对照表 =====
 function showTable(){
-  var html='<table style="width:100%;border-collapse:collapse;font-size:12px">';
-  html+='<thead><tr style="background:var(--bg);position:sticky;top:0">';
-  html+='<th>尺码</th><th>身高</th><th>参考体重</th><th>胸围</th><th>臀围</th><th>大腿围</th></tr></thead><tbody>';
+  var html='<table style="width:100%;border-collapse:collapse;font-size:14px">';
+  html+='<thead><tr style="background:var(--card2);position:sticky;top:0">';
+  html+='<th style="padding:10px 6px">尺码</th><th style="padding:10px 6px">身高</th><th style="padding:10px 6px">参考体重</th><th style="padding:10px 6px">胸围</th><th style="padding:10px 6px">臀围</th><th style="padding:10px 6px">大腿围</th></tr></thead><tbody>';
   var sizes=CHILD_SIZES.concat(ADULT_SIZES);
   var wtRef=Object.assign({},D.child.wtRef,D.adult.wtRef);
   var childSet={};CHILD_SIZES.forEach(function(s){childSet[s]=true});
@@ -2201,7 +2205,7 @@ function showTable(){
     html+='<td>'+thigh+'cm</td></tr>';
   });
   html+='</tbody></table>';
-  document.getElementById('modalTitle').textContent='尺码对照表（儿童+成人）';
+  document.getElementById('modalTitle').innerHTML='📋 尺码对照表（儿童+成人）';
   document.getElementById('modalContent').innerHTML=html;
   document.getElementById('modalBg').classList.add('show');
 }
