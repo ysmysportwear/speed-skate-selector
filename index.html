@@ -594,7 +594,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 </div>
 
 <!-- 尺码对照弹窗 -->
-<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+<div class="modal-bg" id="modalBg" >
   <div class="modal">
     <h3 id="modalTitle">尺码对照表</h3>
     <div id="modalContent"></div>
@@ -668,7 +668,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 </div>
 
 <!-- 下单配置弹窗（面料/缝纫/备注） -->
-<div class="modal-bg" id="orderConfigModal" onclick="if(event.target===this)document.getElementById('orderConfigModal').classList.remove('show')">
+<div class="modal-bg" id="orderConfigModal" >
   <div class="modal">
     <h3>⚙️ 下单配置</h3>
     <div style="margin:12px 0">
@@ -681,7 +681,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
     </div>
     <div style="margin:12px 0">
       <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">📝 备注说明</div>
-      <textarea id="configRemark" rows="3" placeholder="如：加急、特殊包装、颜色备注等" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);resize:none"></textarea>
+      <textarea id="configRemark" rows="3" placeholder="如：加急、特殊包装、颜色备注等" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--card);color:var(--text);resize:none"></textarea>
     </div>
     <div style="display:flex;gap:10px">
       <div class="close" style="flex:1;color:var(--text2)" onclick="document.getElementById('orderConfigModal').classList.remove('show')">取消</div>
@@ -691,21 +691,21 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 </div>
 
 <!-- 收货地址弹窗 -->
-<div class="modal-bg" id="addressModal" onclick="if(event.target===this)document.getElementById('addressModal').classList.remove('show')">
+<div class="modal-bg" id="addressModal" >
   <div class="modal">
     <h3>📍 填写收货地址</h3>
     <div style="margin:16px 0">
       <div style="margin-bottom:12px">
         <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">收货人 *</label>
-        <input type="text" id="shipName" placeholder="请输入收货人姓名" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg)">
+        <input type="text" id="shipName" placeholder="请输入收货人姓名" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--card);color:var(--text)">
       </div>
       <div style="margin-bottom:12px">
         <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">联系电话 *</label>
-        <input type="tel" id="shipPhone" placeholder="请输入手机号码" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg)">
+        <input type="tel" id="shipPhone" placeholder="请输入手机号码" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--card);color:var(--text)">
       </div>
       <div style="margin-bottom:12px">
         <label style="font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">详细地址 *</label>
-        <textarea id="shipAddr" rows="3" placeholder="省/市/区/街道/门牌号" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);resize:none"></textarea>
+        <textarea id="shipAddr" rows="3" placeholder="省/市/区/街道/门牌号" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--card);color:var(--text);resize:none"></textarea>
       </div>
       <div style="font-size:11px;color:var(--text3)">💡 地址信息会自动保存，下次下单无需重复填写</div>
     </div>
@@ -726,7 +726,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 </div>
 
 <!-- 订单详情/导出弹窗 -->
-<div class="modal-bg" id="orderDetailModal" onclick="if(event.target===this)document.getElementById('orderDetailModal').classList.remove('show')">
+<div class="modal-bg" id="orderDetailModal" >
   <div class="modal" style="max-height:90vh">
     <h3>📋 订单详情</h3>
     <div id="orderDetailContent"></div>
@@ -3239,7 +3239,7 @@ window.addEventListener('unhandledrejection',function(e){
 });
 </script>
 <!-- 管理员面板 -->
-<div class="modal-bg" id="adminModal" onclick="if(event.target===this)document.getElementById('adminModal').classList.remove('show')">
+<div class="modal-bg" id="adminModal" >
   <div class="modal">
     <h3>🔑 管理员面板</h3>
     <div style="margin:12px 0">
