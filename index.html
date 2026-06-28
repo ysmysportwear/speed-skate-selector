@@ -890,6 +890,21 @@ if(window.showResult){var _sr=window.showResult;window.showResult=function(sz,in
 var SB_URL='https://hndguaogudhribyimyrg.supabase.co';
 var SB_KEY='sb_publishable_ZDRzwrdUVmLKqo-Yht-03w_zy6u9iWP';
 var sb=null;
+
+// ===== 订单进程定义 =====
+var ORDER_STAGES=[
+  {id:'ordered',   label:'已下单',    icon:'📋', color:'#60a5fa'},
+  {id:'cutting',   label:'排料裁剪',  icon:'✂️', color:'#f59e0b'},
+  {id:'sewing',    label:'缝制中',    icon:'🧵', color:'#8b5cf6'},
+  {id:'printing',  label:'印花烫印',  icon:'🖨️', color:'#ec4899'},
+  {id:'qc',        label:'质量检验',  icon:'🔍', color:'#14b8a6'},
+  {id:'shipped',   label:'已发货',    icon:'📦', color:'#22c55e'},
+  {id:'done',      label:'已完成',    icon:'✅', color:'#64748b'}
+];
+function getStageIndex(id){for(var i=0;i<ORDER_STAGES.length;i++){if(ORDER_STAGES[i].id===id)return i}return -1}
+function getStageLabel(id){var i=getStageIndex(id);return i>=0?ORDER_STAGES[i].label:''}
+function getStageIcon(id){var i=getStageIndex(id);return i>=0?ORDER_STAGES[i].icon:''}
+
 var sbConnected=false;
 try{
   if(!window.supabase||window.__sbLoadFailed){throw new Error('Supabase JS库未加载，请检查网络后刷新')}
@@ -2930,7 +2945,46 @@ async function confirmPayment(orderId,totalItems){
 }
 
 // ===== 删除订单 =====
-async function deleteOrder(orderId,totalItems){
+async // ===== 订单进程管理 =====
+function updateOrderProgress(orderId,stageId){
+  if(!sb){showToast('⚠️ 未连接云端');return}
+  if(!confirm('确定更新订单状态为「'+getStageLabel(stageId)+'」吗？'))return
+  try{
+    // 先读取当前订单
+    sb.from('orders').select('*').eq('id',orderId).then(function(resp){
+      if(resp.error||!resp.data||resp.data.length===0){showToast('⚠️ 订单不存在');return}
+      var o=resp.data[0];
+      var items=o.items||[];
+      var meta={};
+      if(items.length>0&&items[0]._meta) meta=items[0]._meta;
+      meta.progress_stage=stageId;
+      meta.progress_time=new Date().toISOString();
+      // 如果是发货
+      if(stageId==='shipped'){
+        var tn=prompt('请输入快递单号：');
+        if(!tn||!tn.trim()){showToast('⚠️ 请填写快递单号');return}
+        meta.tracking_no=tn.trim();
+        var tc=prompt('请输入快递公司（如：顺丰/中通/圆通）：');
+        if(tc&&tc.trim()) meta.tracking_company=tc.trim();
+      }
+      if(items.length>0){
+        if(!items[0]._meta) items[0]._meta={};
+        items[0]._meta=meta;
+      }
+      var updateData={status:'paid',items:items};
+      sb.from('orders').update(updateData).eq('id',orderId).then(function(r){
+        if(r.error){showToast('❌ 更新失败');return}
+        showToast('✅ 已更新为「'+getStageLabel(stageId)+'」');
+        loadOrders();
+        if(document.getElementById('orderDetailModal').classList.contains('show')){
+          viewOrderDetail(orderId);
+        }
+      });
+    });
+  }catch(e){showToast('❌ 操作失败')}
+}
+
+function deleteOrder(orderId,totalItems){
   showConfirm({
     icon:'🗑️',
     title:'删除订单',
@@ -3001,7 +3055,57 @@ async function viewOrderDetail(orderId){
     if(o.status==='paid'&&o.total_amount>0){
       html+='<div>💰 成交价：<b style="color:var(--accent)">¥'+o.total_amount+'</b></div>';
     }
-    html+='<div>📦 状态：'+(o.status==='paid'?'✅ 已确认':'⏳ 待确认')+'</div>';
+    html+='<div>📦 状态：'+(o.status==='unpaid'?'⏳ 待确认':'')+'</div>';
+    // 订单进度条
+    if(o.status!=='unpaid'){
+      var curStage=(o.items&&o.items[0]&&o.items[0]._meta&&o.items[0]._meta.progress_stage)||'ordered';
+      var curIdx=getStageIndex(curStage);
+      html+='<div style="margin:12px 0;padding:12px;background:var(--bg);border-radius:10px">';
+      html+='<div style="display:flex;justify-content:space-between;margin-bottom:8px">';
+      html+='<span style="font-size:12px;font-weight:600;color:var(--text)">📋 生产进度</span>';
+      html+='<span style="font-size:11px;color:var(--accent)">'+getStageLabel(curStage)+'</span>';
+      html+='</div>';
+      // 进度条
+      html+='<div style="display:flex;gap:2px;margin-bottom:8px">';
+      for(var si=0;si<ORDER_STAGES.length;si++){
+        var st=ORDER_STAGES[si];
+        var done=si<=curIdx;
+        html+='<div style="flex:1;height:4px;border-radius:2px;background:'+(done?st.color:'var(--border)')+'"></div>';
+      }
+      html+='</div>';
+      // 阶段图标
+      html+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:6px">';
+      for(var si=0;si<ORDER_STAGES.length;si++){
+        var st=ORDER_STAGES[si];
+        var done=si<=curIdx;
+        html+='<span style="color:'+(done?st.color:'var(--text3)')+';font-weight:'+(si===curIdx?'700':'400')+'">'+st.icon+'</span>';
+      }
+      html+='</div>';
+      // 快递信息
+      var tn=(o.items&&o.items[0]&&o.items[0]._meta&&o.items[0]._meta.tracking_no)||o.tracking_no||'';var tc=(o.items&&o.items[0]&&o.items[0]._meta&&o.items[0]._meta.tracking_company)||o.tracking_company||'';if(curStage==='shipped'&&tn){
+        html+='<div style="margin-top:8px;padding:8px 10px;background:var(--card);border-radius:8px;font-size:12px;line-height:1.6">';
+        html+='<span style="color:var(--accent)">📦 '+(tc||'快递')+'：</span>';
+        html+='<b style="color:var(--text)">'+tn+'</b>';
+        html+='<span style="margin-left:8px;font-size:11px"><a href="https://www.kuaidi100.com/chaxun?nu='+tn+'" target="_blank" style="color:var(--accent)">查询跟踪 →</a></span>';
+        html+='</div>';
+      }
+      html+='</div>';
+      // 管理员操作
+      if(isAdmin){
+        html+='<div style="margin:8px 0">';
+        html+='<div style="font-size:11px;color:var(--text3);margin-bottom:6px">🔧 更新进度：</div>';
+        html+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
+        for(var si=0;si<ORDER_STAGES.length;si++){
+          var st=ORDER_STAGES[si];
+          if(si===curIdx){
+            html+='<span style="padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:'+st.color+';color:#fff">'+st.icon+' '+st.label+' ✓</span>';
+          }else if(si>curIdx){
+            html+='<span onclick="updateOrderProgress(''+o.id+'',''+st.id+'')" style="cursor:pointer;padding:4px 8px;border-radius:6px;font-size:11px;border:1px solid var(--border);color:var(--text2)">'+st.icon+' '+st.label+' →</span>';
+          }
+        }
+        html+='</div></div>';
+      }
+    }
     if(o.fabric) html+='<div>🧵 面料：'+o.fabric+'</div>';
     if(o.stitch) html+='<div>🧷 工艺：'+o.stitch+'</div>';
     if(o.remark) html+='<div>📝 备注：<span style="color:var(--text2)">'+o.remark+'</span></div>';
